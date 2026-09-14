@@ -1,7 +1,8 @@
 import { useState, FormEvent, useEffect } from 'react';
-import { Send, CheckCircle2, Sparkles, Phone, Mail, User, Clock, AlertCircle, Check, Tag } from 'lucide-react';
+import { Send, CheckCircle2, Sparkles, Phone, Mail, User, Clock, AlertCircle, Check, Tag, FileSpreadsheet } from 'lucide-react';
 import { VICI_INFO } from '../data/viciData';
 import { Lead } from '../types';
+import { syncLeadToGoogleSheet } from '../services/googleSheetsService';
 
 interface LeadFormProps {
   prefilledCourse?: string;
@@ -205,6 +206,8 @@ export default function LeadForm({ prefilledCourse, onLeadSubmitted }: LeadFormP
       if (result.success && result.lead) {
         setSubmittedLead(result.lead);
         if (onLeadSubmitted) onLeadSubmitted(result.lead);
+        // Simultaneously sync to Google Sheet
+        syncLeadToGoogleSheet(result.lead).catch((e) => console.warn('Background sheet sync notice:', e));
       } else {
         throw new Error(result.error || 'Có lỗi xảy ra');
       }
@@ -219,6 +222,8 @@ export default function LeadForm({ prefilledCourse, onLeadSubmitted }: LeadFormP
       };
       setSubmittedLead(localLead);
       if (onLeadSubmitted) onLeadSubmitted(localLead);
+      // Simultaneously sync to Google Sheet
+      syncLeadToGoogleSheet(localLead).catch((e) => console.warn('Background sheet sync notice:', e));
     } finally {
       setIsSubmitting(false);
     }
@@ -267,6 +272,11 @@ export default function LeadForm({ prefilledCourse, onLeadSubmitted }: LeadFormP
                 Cảm ơn <strong>{submittedLead.name}</strong>. Đội ngũ VICI đã nhận được thông tin đăng ký và sẽ liên hệ qua số điện thoại{' '}
                 <strong>{submittedLead.phone}</strong> trong thời gian sớm nhất để tư vấn chương trình chi tiết.
               </p>
+
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium">
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Đã ghi nhận vào Admin CRM &amp; đồng bộ lên Google Sheet</span>
+              </div>
 
               <div className="p-4 rounded-xl bg-[#F8F5EE] border border-[#E8DFC8] text-xs text-[#555A4E] text-left max-w-md mx-auto space-y-1.5">
                 <p>

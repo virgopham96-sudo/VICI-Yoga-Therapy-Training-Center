@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
-import { X, Send, Sparkles, Bot, User, ShieldAlert, CheckCircle2, RotateCcw, ArrowRight, Calendar, PhoneCall, Info, Check } from 'lucide-react';
+import { X, Send, Sparkles, Bot, User, ShieldAlert, CheckCircle2, RotateCcw, ArrowRight, Calendar, PhoneCall, Info, Check, FileSpreadsheet } from 'lucide-react';
 import { Lead } from '../types';
 import { getViciConsultation } from '../data/viciAdvisor';
+import { syncLeadToGoogleSheet } from '../services/googleSheetsService';
 
 interface Message {
   id: string;
@@ -435,6 +436,7 @@ export default function AIChatModal({
       const data = await res.json();
       if (data.success && data.lead) {
         if (onLeadCaptured) onLeadCaptured(data.lead);
+        syncLeadToGoogleSheet(data.lead).catch((err) => console.warn('Chat lead sheet sync notice:', err));
       }
     } catch (e) {
       // Ignored for UI flow

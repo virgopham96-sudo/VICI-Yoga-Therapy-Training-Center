@@ -21,6 +21,7 @@ import Footer from './components/Footer';
 import MobileBottomBar from './components/MobileBottomBar';
 import AIChatModal from './components/AIChatModal';
 import AdminDashboard from './components/admin/AdminDashboard';
+import AdminLoginModal, { isUserAdminLoggedIn, logoutAdmin } from './components/admin/AdminLoginModal';
 import { Lead } from './types';
 import { Sparkles, CheckCircle2 } from 'lucide-react';
 
@@ -29,7 +30,14 @@ export default function App() {
   const [aiInitialTopic, setAiInitialTopic] = useState<string | undefined>(undefined);
   const [prefilledCourse, setPrefilledCourse] = useState<string>('');
   const [isAdminView, setIsAdminView] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(isUserAdminLoggedIn());
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [toastNotification, setToastNotification] = useState<string | null>(null);
+
+  // Check auth on mount
+  useEffect(() => {
+    setIsAdminLoggedIn(isUserAdminLoggedIn());
+  }, []);
 
   // Trigger AI Chat modal with optional prompt
   const handleOpenAIChat = (initialTopic?: string) => {
@@ -48,9 +56,45 @@ export default function App() {
     }
   };
 
+  // Switch to or from Admin CRM with Login gate
+  const handleToggleAdminView = (val?: boolean) => {
+    const targetState = val !== undefined ? val : !isAdminView;
+    if (targetState) {
+      if (isAdminLoggedIn || isUserAdminLoggedIn()) {
+        setIsAdminLoggedIn(true);
+        setIsAdminView(true);
+      } else {
+        setIsLoginModalOpen(true);
+      }
+    } else {
+      setIsAdminView(false);
+    }
+  };
+
+  // Successful login handler
+  const handleLoginSuccess = () => {
+    setIsAdminLoggedIn(true);
+    setIsAdminView(true);
+    setToastNotification('Đăng nhập Quản trị viên VICI thành công!');
+    setTimeout(() => {
+      setToastNotification(null);
+    }, 4000);
+  };
+
+  // Admin Logout handler
+  const handleLogout = () => {
+    logoutAdmin();
+    setIsAdminLoggedIn(false);
+    setIsAdminView(false);
+    setToastNotification('Đã đăng xuất khỏi hệ thống Admin CRM.');
+    setTimeout(() => {
+      setToastNotification(null);
+    }, 3000);
+  };
+
   // Lead captured from form or chat
   const handleLeadCaptured = (lead: Lead) => {
-    setToastNotification(`Đã lưu thông tin tư vấn của ${lead.name} (${lead.phone}) vào hệ thống VICI CRM!`);
+    setToastNotification(`Đã ghi nhận thông tin của ${lead.name} (${lead.phone}) vào CRM & đồng bộ Google Sheets!`);
     setTimeout(() => {
       setToastNotification(null);
     }, 6000);
@@ -60,7 +104,9 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (isAIChatOpen) {
+        if (isLoginModalOpen) {
+          setIsLoginModalOpen(false);
+        } else if (isAIChatOpen) {
           setIsAIChatOpen(false);
         } else if (toastNotification) {
           setToastNotification(null);
@@ -69,7 +115,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAIChatOpen, toastNotification]);
+  }, [isAIChatOpen, isLoginModalOpen, toastNotification]);
 
   return (
     <div className="min-h-screen bg-[#FFFDF8] text-[#252822] font-sans antialiased selection:bg-[#D69A2D]/20 selection:text-[#8A6437]">
@@ -92,12 +138,15 @@ export default function App() {
         onOpenAIChat={handleOpenAIChat}
         onOpenRegister={handleOpenRegister}
         isAdminView={isAdminView}
-        onToggleAdminView={(val) => setIsAdminView(val !== undefined ? val : !isAdminView)}
+        onToggleAdminView={handleToggleAdminView}
       />
 
       {/* Main Page Content or Admin View */}
       {isAdminView ? (
-        <AdminDashboard onClose={() => setIsAdminView(false)} />
+        <AdminDashboard
+          onClose={() => setIsAdminView(false)}
+          onLogout={handleLogout}
+        />
       ) : (
         <main>
           {/* Hero Section */}
@@ -181,6 +230,13 @@ export default function App() {
         initialTopic={aiInitialTopic}
         onLeadCaptured={handleLeadCaptured}
         onOpenRegisterForm={handleOpenRegister}
+      />
+
+      {/* Admin CRM Authentication Modal */}
+      <AdminLoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
       />
     </div>
   );

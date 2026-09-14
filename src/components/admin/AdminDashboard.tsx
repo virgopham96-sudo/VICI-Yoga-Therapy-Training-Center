@@ -18,15 +18,22 @@ import {
   MessageSquare,
   Sparkles,
   TrendingUp,
+  FileSpreadsheet,
+  Download,
+  LogOut,
+  ShieldCheck,
 } from 'lucide-react';
 import { Lead } from '../../types';
+import GoogleSheetsSyncModal from './GoogleSheetsSyncModal';
+import { exportLeadsToCSV, getGoogleSheetWebhookUrl } from '../../services/googleSheetsService';
 
 interface AdminDashboardProps {
   onClose: () => void;
   onOpenRegisterForm?: () => void;
+  onLogout?: () => void;
 }
 
-export default function AdminDashboard({ onClose }: AdminDashboardProps) {
+export default function AdminDashboard({ onClose, onLogout }: AdminDashboardProps) {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,6 +41,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
   const [filterScore, setFilterScore] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [isSheetsModalOpen, setIsSheetsModalOpen] = useState(false);
 
   // Note editing state
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -103,12 +111,12 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
     }
   };
 
-  // Add dummy test lead for demo testing
+  // Add sample lead for quick testing
   const handleAddSampleLead = async () => {
     const sample = {
-      name: `Học Viên Demo ${Math.floor(Math.random() * 900 + 100)}`,
+      name: `Học Viên Mới ${Math.floor(Math.random() * 900 + 100)}`,
       phone: `09${Math.floor(Math.random() * 89999999 + 10000000)}`,
-      email: 'hocvien.demo@gmail.com',
+      email: 'hocvien.moi@gmail.com',
       source: 'Website Form' as const,
       interest: 'Scan Trị Liệu Cơ - Vai - Cổ - Gáy (650.000đ)',
       category: 'THERAPY_INTEREST' as const,
@@ -186,13 +194,39 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Google Sheets Sync Button */}
+            <button
+              id="admin-google-sheets-btn"
+              onClick={() => setIsSheetsModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-900/60 hover:bg-emerald-900/90 border border-emerald-500/40 text-xs font-semibold text-emerald-100 transition-all cursor-pointer shadow-2xs"
+              title="Quản lý đồng bộ dữ liệu với Google Sheets"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="hidden sm:inline">Google Sheets</span>
+              {getGoogleSheetWebhookUrl() ? (
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Tự động đồng bộ đang hoạt động" />
+              ) : (
+                <span className="text-[10px] bg-amber-400/20 text-amber-300 px-1 py-0.2 rounded border border-amber-400/30">Cài đặt</span>
+              )}
+            </button>
+
+            {/* Export CSV Button */}
+            <button
+              onClick={() => exportLeadsToCSV(leads)}
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-stone-200 transition-all cursor-pointer"
+              title="Xuất dữ liệu ra file Excel/CSV chuẩn tiếng Việt"
+            >
+              <Download className="w-4 h-4" />
+              <span>Xuất CSV</span>
+            </button>
+
             <button
               onClick={handleAddSampleLead}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-800/40 hover:bg-amber-800/70 border border-amber-400/40 text-xs font-semibold text-amber-200 transition-all cursor-pointer"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-800/40 hover:bg-amber-800/70 border border-amber-400/40 text-xs font-semibold text-amber-200 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Thêm Lead Thử Nghiệm</span>
+              <span>Thêm Lead Mới</span>
             </button>
 
             <button
@@ -202,6 +236,17 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             </button>
+
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-950/40 hover:bg-red-900/70 border border-red-500/30 text-xs font-semibold text-red-200 transition-all cursor-pointer"
+                title="Đăng xuất khỏi Admin CRM"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Đăng Xuất</span>
+              </button>
+            )}
 
             <button
               onClick={onClose}
@@ -672,6 +717,13 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
             </div>
           </div>
         )}
+
+        {/* Google Sheets Sync Modal */}
+        <GoogleSheetsSyncModal
+          isOpen={isSheetsModalOpen}
+          onClose={() => setIsSheetsModalOpen(false)}
+          leads={leads}
+        />
       </div>
     </div>
   );

@@ -96,15 +96,15 @@ export default function Header({
               <span>Hotline: {VICI_INFO.hotline}</span>
             </a>
             
-            {/* Quick Switcher to Admin Demo */}
+            {/* Switcher to Admin CRM */}
             <button
               id="header-toggle-admin-btn"
               onClick={() => onToggleAdminView(!isAdminView)}
-              className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-900/40 hover:bg-amber-900/70 border border-amber-400/30 text-amber-200 text-[11px] transition-all cursor-pointer"
-              title="Xem hệ thống quản lý Lead Demo"
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-900/40 hover:bg-amber-900/70 border border-amber-400/30 text-amber-200 text-[11px] font-medium transition-all cursor-pointer"
+              title="Truy cập hệ thống quản trị Admin CRM"
             >
               <LayoutDashboard className="w-3 h-3" />
-              <span>{isAdminView ? 'Quay lại Website' : 'Admin CRM Demo'}</span>
+              <span>{isAdminView ? 'Quay lại Website' : 'Admin CRM'}</span>
             </button>
           </div>
         </div>
@@ -238,7 +238,7 @@ export default function Header({
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#8A6437]/10 text-[#8A6437] font-medium text-sm border border-[#8A6437]/20"
               >
                 <LayoutDashboard className="w-4 h-4" />
-                <span>{isAdminView ? 'Về trang chủ Website' : 'Mở Admin Lead CRM'}</span>
+                <span>{isAdminView ? 'Về trang chủ Website' : 'Mở Admin CRM'}</span>
               </button>
             </div>
           </nav>

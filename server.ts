@@ -1,9 +1,8 @@
 import express from 'express';
 import path from 'path';
-import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
-import { VICI_SYSTEM_PROMPT, getViciConsultation } from './src/data/viciAdvisor';
+import { processChatConsultation } from './src/services/aiAdvisorService';
 
 dotenv.config();
 
@@ -89,35 +88,17 @@ let leadsStore = [
   }
 ];
 
-// Lazy Gemini client helper
-let geminiClient: GoogleGenAI | null = null;
-function getGeminiClient(): GoogleGenAI | null {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
-    return null;
-  }
-  if (!geminiClient) {
-    geminiClient = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build'
-        }
-      }
-    });
-  }
-  return geminiClient;
-}
-
-// System instruction and expert knowledge base are centralized in ./src/data/viciAdvisor
-
-
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  const hasGeminiKey = !!apiKey && apiKey !== 'MY_GEMINI_API_KEY' && apiKey.trim() !== '';
+
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    geminiAvailable: !!process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MY_GEMINI_API_KEY'
+    geminiAvailable: hasGeminiKey,
+    hasApiKeyConfigured: hasGeminiKey,
+    environment: 'node_server'
   });
 });
 
@@ -218,89 +199,33 @@ app.post('/api/chat', async (req, res) => {
   const { message, history, conversationHistory } = req.body;
 
   if (!message || typeof message !== 'string') {
-    return res.status(400).json({ success: false, error: 'Message is required' });
+    return res.status(400).json({ success: false, error: 'Tin nhắn không được để trống' });
   }
 
-  const ai = getGeminiClient();
-
-  if (ai) {
-    // Model fallback sequence: fast lite model first for immediate responsiveness, then flash
-    const candidateModels = ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-flash-latest'];
-
-    // Normalize history array
+  try {
     const rawHistory = Array.isArray(conversationHistory)
       ? conversationHistory
       : Array.isArray(history)
       ? history
       : [];
 
-    const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
-
-    // Map history to proper Gemini user/model turns
-    for (const item of rawHistory.slice(-8)) {
-      const isUser = item.role === 'user' || item.sender === 'user';
-      const isModel = item.role === 'model' || item.role === 'assistant' || item.sender === 'ai';
-      const text = (item.text || item.content || '').trim();
-
-      if (text) {
-        if (isUser) {
-          // Avoid consecutive identical roles
-          if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
-            contents[contents.length - 1].parts[0].text += `\n${text}`;
-          } else {
-            contents.push({ role: 'user', parts: [{ text }] });
-          }
-        } else if (isModel && contents.length > 0) {
-          if (contents[contents.length - 1].role === 'model') {
-            contents[contents.length - 1].parts[0].text += `\n${text}`;
-          } else {
-            contents.push({ role: 'model', parts: [{ text }] });
-          }
-        }
-      }
-    }
-
-    // Add current user message
-    if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
-      contents[contents.length - 1].parts[0].text += `\n${message}`;
-    } else {
-      contents.push({ role: 'user', parts: [{ text: message }] });
-    }
-
-    for (const modelName of candidateModels) {
-      try {
-        const response = await ai.models.generateContent({
-          model: modelName,
-          contents,
-          config: {
-            systemInstruction: VICI_SYSTEM_PROMPT,
-            temperature: 0.6
-          }
-        });
-
-        const replyText = response.text?.trim();
-        if (replyText) {
-          return res.json({
-            success: true,
-            reply: replyText,
-            source: 'gemini',
-            model: modelName
-          });
-        }
-      } catch (err: any) {
-        console.warn(`Model ${modelName} returned error:`, err?.status || err?.message || err);
-        // Continue to next candidate model
-      }
-    }
+    const result = await processChatConsultation(message, rawHistory);
+    res.json({
+      success: true,
+      reply: result.reply,
+      source: result.source,
+      model: result.model,
+      isAiActive: result.isAiActive,
+      notice: result.notice
+    });
+  } catch (err: any) {
+    console.error('Lỗi API /api/chat trên server:', err);
+    res.status(500).json({
+      success: false,
+      error: err?.message || 'Lỗi xử lý tư vấn',
+      source: 'error'
+    });
   }
-
-  // Fallback to our extensive local expert engine
-  const expertReply = getViciConsultation(message);
-  res.json({
-    success: true,
-    reply: expertReply,
-    source: 'local_expert'
-  });
 });
 
 async function startServer() {

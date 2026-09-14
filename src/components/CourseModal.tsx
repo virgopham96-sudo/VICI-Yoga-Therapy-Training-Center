@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { X, CheckCircle2, Clock, Calendar, Users, Award, Shield, ArrowRight } from 'lucide-react';
 import { Course } from '../types';
 
@@ -8,10 +9,32 @@ interface CourseModalProps {
 }
 
 export default function CourseModal({ course, onClose, onRegisterCourse }: CourseModalProps) {
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!course) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [course, onClose]);
+
   if (!course) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="bg-[#FFFDF8] w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E8DFC8] overflow-hidden max-h-[90vh] flex flex-col">
         {/* Modal Header */}
         <div className="relative p-6 sm:p-8 bg-gradient-to-r from-[#F8F5EE] to-[#FAF7F0] border-b border-[#E8DFC8] flex items-start justify-between">
@@ -37,14 +60,23 @@ export default function CourseModal({ course, onClose, onRegisterCourse }: Cours
             </div>
           </div>
 
-          <button
-            id="course-modal-close-btn"
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-black/5 text-[#555A4E] transition-colors cursor-pointer"
-            aria-label="Đóng"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <span
+              className="hidden sm:inline-block text-[10px] bg-black/5 text-[#555A4E] px-1.5 py-0.5 rounded border border-[#D5C7AA]/50 font-mono select-none"
+              title="Nhấn phím Esc để đóng"
+            >
+              Esc
+            </span>
+            <button
+              id="course-modal-close-btn"
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-black/5 text-[#555A4E] transition-colors cursor-pointer"
+              aria-label="Đóng (Phím Esc)"
+              title="Đóng (Phím Esc)"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Modal Scrollable Content */}

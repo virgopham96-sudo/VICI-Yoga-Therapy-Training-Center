@@ -60,6 +60,23 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
     fetchLeads();
   }, []);
 
+  // Handle Escape key to close modal or exit admin view
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (selectedLead) {
+          setSelectedLead(null);
+        } else {
+          onClose();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedLead, onClose]);
+
   // Update lead status or notes
   const handleUpdateLead = async (
     id: string,
@@ -440,7 +457,14 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
 
         {/* Lead Detail Drawer / Modal */}
         {selectedLead && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div
+            className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setSelectedLead(null);
+              }
+            }}
+          >
             <div className="bg-[#FFFDF8] w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E8DFC8] overflow-hidden max-h-[90vh] flex flex-col">
               {/* Drawer Header */}
               <div className="p-6 bg-gradient-to-r from-[#FAF7F0] to-[#F4EADA] border-b border-[#E8DFC8] flex items-start justify-between">
@@ -462,12 +486,22 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
                   </p>
                 </div>
 
-                <button
-                  onClick={() => setSelectedLead(null)}
-                  className="p-1.5 rounded-full hover:bg-black/5 text-gray-500 cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className="hidden sm:inline-block text-[10px] bg-black/5 text-[#555A4E] px-1.5 py-0.5 rounded border border-[#D5C7AA]/50 font-mono select-none"
+                    title="Nhấn phím Esc để đóng"
+                  >
+                    Esc
+                  </span>
+                  <button
+                    onClick={() => setSelectedLead(null)}
+                    className="p-1.5 rounded-full hover:bg-black/5 text-gray-500 cursor-pointer"
+                    aria-label="Đóng (Phím Esc)"
+                    title="Đóng (Phím Esc)"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Drawer Body */}

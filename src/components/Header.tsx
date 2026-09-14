@@ -27,6 +27,21 @@ export default function Header({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle Escape key to close mobile navigation drawer
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
   const navLinks = [
     { label: 'Trang chủ', href: '#hero' },
     { label: 'Về VICI', href: '#about' },

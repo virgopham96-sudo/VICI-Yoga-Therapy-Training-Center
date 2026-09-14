@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, Clock, Filter, CheckCircle2, ChevronRight, User } from 'lucide-react';
 import { VICI_ASSETS } from '../data/viciData';
 
@@ -10,6 +10,21 @@ export default function Schedule({ onOpenRegister }: ScheduleProps) {
   const [selectedDay, setSelectedDay] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFullScheduleModal, setShowFullScheduleModal] = useState<boolean>(false);
+
+  // Handle Escape key to close timetable modal
+  useEffect(() => {
+    if (!showFullScheduleModal) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowFullScheduleModal(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showFullScheduleModal]);
 
   const daysList = [
     { id: 'all', label: 'Tất cả các ngày' },
@@ -227,7 +242,14 @@ export default function Schedule({ onOpenRegister }: ScheduleProps) {
 
       {/* Modal View Full Schedule Image */}
       {showFullScheduleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowFullScheduleModal(false);
+            }
+          }}
+        >
           <div className="bg-white max-w-4xl w-full rounded-3xl overflow-hidden shadow-2xl p-6 max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between pb-4 border-b border-gray-100">
               <div>
@@ -238,12 +260,22 @@ export default function Schedule({ onOpenRegister }: ScheduleProps) {
                   Khung giờ áp dụng cho cả hình thức Online & Offline tại Opal Boulevard
                 </p>
               </div>
-              <button
-                onClick={() => setShowFullScheduleModal(false)}
-                className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="hidden sm:inline-block text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded border border-gray-200 font-mono select-none"
+                  title="Nhấn phím Esc để đóng"
+                >
+                  Esc
+                </span>
+                <button
+                  onClick={() => setShowFullScheduleModal(false)}
+                  className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 transition-colors cursor-pointer"
+                  aria-label="Đóng (Phím Esc)"
+                  title="Đóng (Phím Esc)"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             <div className="overflow-auto py-4 flex-grow text-center">

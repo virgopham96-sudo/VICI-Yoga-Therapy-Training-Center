@@ -44,19 +44,122 @@ BẢNG HỌC PHÍ TẠI VICI:
 - Khóa Ashtanga 10 chuyên đề (Master Henry Phan): 1.290.000 VNĐ (Ưu đãi Early Bird)
 - Khóa Đào tạo HLV Quốc Tế E-RYT 500 / YACEP: Đào tạo cấp chứng chỉ Yoga Alliance Hoa Kỳ
 
-LỊCH HỌC TẠI VICI (Thứ 2 đến Thứ 7):
-- Sáng sớm: 05:00 - 06:00 (Đón bình minh, Newbie Yoga)
-- Sáng: 06:30 - 07:30 & 08:00 - 09:00 (Yoga Nền tảng & Trị liệu phục hồi)
-- Trưa / Lớp HLV: 09:00 - 12:00
-- Chiều: 14:00 - 15:30 (Ashtanga & Chuyên đề nâng cao)
-- Tối sau giờ làm: 17:45 - 18:45 & 19:00 - 20:00 (Yoga Trị liệu vai gáy & cột sống)
+THỜI KHÓA BIỂU CHÍNH THỨC TẠI VICI (Thứ 2 đến Thứ 7):
+* 05:00 – 06:00: Yoga For Newbie (Lớp nền tảng cho người mới, đánh thức năng lượng buổi sáng)
+* 06:30 – 07:30: Trị Liệu Chuyên Đề Sáng (T2: Kéo giãn | T3: Mở hông | T4: Mở vai & Lưng trên | T5: Vặn xoắn | T6: Thăng bằng)
+* 08:00 – 09:00: Yoga Dòng Chảy & Cột Sống (Hatha, Vinyasa, Yin, Yoga Detox, Ashtanga Cột sống)
+* 09:00 – 12:00: Đào Tạo Huấn Luyện Viên Yoga Quốc Tế E-RYT 500 (T2 - T4 - T6)
+* 14:00 – 15:30: Yoga Nâng Cao Ashtanga & Cột Sống (10 chuyên đề Master Henry Phan, T3 & T5)
+* 17:45 – 18:45: Lớp Tan Ca Phục Hồi Thân Thể (Chuyên sâu cho dân văn phòng sau giờ làm)
+* 19:00 – 20:00: Yoga Buổi Tối & Trị Liệu Chuông Xoay (T2, T4, T6: Newbie Yoga | T3: Gentle | T5: Chuông xoay trị liệu)
+* Thứ 7 & Chủ Nhật: Dành cho Workshop Chuông xoay & Đặt lịch Scan Trị liệu 1-1 theo giờ hẹn riêng.
+
+QUY TẮC TƯ VẤN LỊCH HỌC & CHỌN LỚP THEO THỜI GIAN BIỂU CỦA HỌC VIÊN:
+- Khi người dùng hỏi về lịch học, giờ tập, hoặc nói về thời gian biểu làm việc (ví dụ: làm từ 8h sáng đến 6h tối, làm giờ hành chính, chỉ rảnh buổi tối, chỉ rảnh sáng sớm...):
+  1. PHÂN TÍCH VÀ ĐỀ XUẤT LỚP PHÙ HỢP TRỰC TIẾP ĐẦU TIÊN:
+     - Với người làm 8h00 - 18h00 / giờ hành chính:
+       + Khung giờ tối 19:00 - 20:00 là LỰA CHỌN LÝ TƯỞNG NHẤT: Vừa vặn sau khi tan làm lúc 18:00, di chuyển tới Studio tại Opal Boulevard (Phạm Văn Đồng), nghỉ ngơi nhẹ và vào lớp. Các ngày T2-T4-T6 có Newbie Yoga, T3 Gentle Yoga, T5 Yoga Therapy Chuông xoay.
+       + Khung giờ sáng sớm 05:00 - 06:00 (Yoga For Newbie): Tập xong lúc 6:00, tắm rửa ăn sáng rồi đến công ty trước 8:00, tràn đầy năng lượng tỉnh táo.
+       + Khung giờ tan ca sớm 17:45 - 18:45: Nếu có ngày về sớm trước 17:30 hoặc làm việc gần Phạm Văn Đồng.
+  2. KẾT HỢP LỜI KHUYÊN PHỤC HỒI DÂN VĂN PHÒNG: Phân tích cơ chế ngồi nhiều 8-10 tiếng gây gù lưng và nén thắt lưng, hướng dẫn 1-2 động tác giải mỏi và khuyên đặt lịch 1 buổi Scan Trị liệu 1-1 (650k) hoặc tham gia lớp tối 19:00.
 `;
 
 export function getViciConsultation(message: string): string {
   const lower = (message || '').toLowerCase().trim();
 
-  // 1. CÂU HỎI TƯ VẤN CHUNG / TƯ VẤN GIÚP TÔI / BẮT ĐẦU TỪ ĐÂU
-  // Tránh việc quăng số điện thoại! Cung cấp tư vấn toàn diện và bài bản ngay lập tức.
+  // 1. HỎI VỀ LỊCH HỌC, THỜI KHÓA BIỂU, CA TẬP, CHỌN LỚP THEO KHUNG GIỜ LÀM VIỆC (VÍ DỤ: LÀM 8H-18H, DÂN VĂN PHÒNG, CA SÁNG, CA TỐI)
+  const isScheduleOrTimeInquiry =
+    lower.includes('lịch') ||
+    lower.includes('thời khóa biểu') ||
+    lower.includes('tkb') ||
+    lower.includes('ca tập') ||
+    lower.includes('ca học') ||
+    lower.includes('mấy giờ') ||
+    lower.includes('giờ học') ||
+    lower.includes('giờ tập') ||
+    lower.includes('lớp nào phù hợp') ||
+    lower.includes('lớp phù hợp') ||
+    lower.includes('có lớp nào') ||
+    lower.includes('chọn lớp nào') ||
+    lower.includes('khung giờ') ||
+    lower.includes('tan làm') ||
+    lower.includes('tan ca') ||
+    lower.includes('làm từ') ||
+    lower.includes('làm việc từ') ||
+    lower.includes('hành chính') ||
+    (lower.includes('lớp') && (lower.includes('sáng') || lower.includes('tối') || lower.includes('chiều') || lower.includes('trưa'))) ||
+    (lower.includes('rảnh') && (lower.includes('sáng') || lower.includes('tối') || lower.includes('chiều') || lower.includes('giờ')));
+
+  if (isScheduleOrTimeInquiry) {
+    const isOfficeHours =
+      lower.includes('8h') ||
+      lower.includes('6h') ||
+      lower.includes('18h') ||
+      lower.includes('17h') ||
+      lower.includes('văn phòng') ||
+      lower.includes('hành chính') ||
+      lower.includes('làm từ') ||
+      lower.includes('tan làm') ||
+      lower.includes('tan ca');
+
+    if (isOfficeHours) {
+      return `Namaste bạn! Với khung giờ làm việc văn phòng từ **8h00 sáng đến 18h00 tối**, VICI Yoga Therapy đã thiết kế thời khóa biểu tối ưu để bạn dễ dàng duy trì việc chăm sóc sức khỏe mà không lo ảnh hưởng đến công việc:
+
+🌟 **LỰA CHỌN 1 (LÝ TƯỞNG NHẤT): CA TỐI 19:00 – 20:00**
+* **Vừa vặn thời gian:** Tan làm lúc 18h00, bạn có trọn vẹn 60 phút để di chuyển tới Studio (Căn hộ B1-0705, Chung cư Opal Boulevard, mặt tiền Phạm Văn Đồng), thay trang phục, nghỉ ngơi nhẹ và bước vào buổi tập trong tâm thế thảnh thơi, không bị vội vã.
+* **Lớp học chuyên sâu phù hợp:**
+  - **Thứ 2 – Thứ 4 – Thứ 6 (19:00 - 20:00):** Lớp *Yoga For Newbie & Trị Liệu Cột Sống* – Nhịp độ chậm rãi, giáo viên chỉnh sửa từng tư thế, cực kỳ phù hợp cho người mới hoặc người bị căng cứng lưng, cổ vai sau ngày dài ngồi máy tính.
+  - **Thứ 3 (19:00 - 20:00):** *Gentle Yoga Thư Giãn Thân Thể* – Kéo giãn dịu nhẹ toàn thân.
+  - **Thứ 5 (19:00 - 20:00):** *Yoga Therapy kết hợp Chuông Xoay Tây Tạng* – Sóng âm chuông xoay giúp giải tỏa co thắt cơ mạn tính và xua tan căng thẳng thần kinh, mang lại giấc ngủ sâu lành.
+
+🌅 **LỰA CHỌN 2: CA SÁNG SỚM 05:00 – 06:00 (ĐÓN BÌNH MINH)**
+* Nếu bạn là người yêu thích lối sống lành mạnh, muốn nạp đầy năng lượng trước khi vào giờ làm:
+  - Lớp *Yoga For Newbie* (05:00 - 06:00, Thứ 2 đến Thứ 6) giúp đánh thức các khối cơ khớp, kích hoạt hơi thở sâu.
+  - Kết thúc lúc 06:00, bạn thong thả tắm rửa, ăn sáng dinh dưỡng và đến công ty trước 08:00 sáng với tinh thần sảng khoái, tỉnh táo gấp bội.
+
+🌆 **LỰA CHỌN 3: CA TAN CA 17:45 – 18:45**
+* Dành cho những ngày bạn tan làm sớm trước 17:30 hoặc công ty ở gần khu vực Thủ Đức / Dĩ An / Phạm Văn Đồng: Lớp *Tan Ca Phục Hồi Thân Thể* (T2 Hatha, T3 Mở vai ngực, T4 Dynamic nhẹ, T5 Mở hông, T6 Kéo giãn chuyên sâu).
+
+📋 **THỜI KHÓA BIỂU ĐẦY ĐỦ TẠI VICI (Thứ 2 – Thứ 7):**
+* **05:00 – 06:00:** Yoga For Newbie (Người mới bắt đầu)
+* **06:30 – 07:30:** Trị Liệu Chuyên Đề Sáng (Mở hông, vai ngực, vặn xoắn)
+* **08:00 – 09:00:** Yoga Dòng Chảy & Cột Sống (Hatha, Vinyasa, Yin)
+* **09:00 – 12:00:** Khóa Đào Tạo HLV Yoga Quốc Tế E-RYT 500
+* **14:00 – 15:30:** Yoga Nâng Cao Ashtanga 10 Chuyên Đề (Master Henry Phan)
+* **17:45 – 18:45:** Lớp Tan Ca Phục Hồi Thân Thể (Dân văn phòng)
+* **19:00 – 20:00:** Yoga Buổi Tối & Trị Liệu Chuông Xoay (Thư giãn sâu, ngủ ngon)
+* **Thứ 7 & Chủ Nhật:** Workshop Chuông Xoay & Đặt lịch Scan Trị Liệu 1-1 theo giờ hẹn.
+
+💡 **LỜI KHUYÊN TỪ MASTER HENRY PHAN:**
+Người ngồi văn phòng 10 tiếng liên tục rất dễ gặp phải tình trạng cơ ngực co ngắn gây gù vai và cơ thắt lưng bị chèn ép. Bạn có thể bắt đầu bằng **01 buổi Scan Trị Liệu 1-1 (45-60 phút, 650.000đ)** để Master đo lường góc lệch cột sống và xếp lớp chính xác nhất, hoặc đăng ký tham gia ngay **lớp tối 19:00 - 20:00**.
+
+Bạn thấy khung giờ tối 19:00 hay sáng sớm 05:00 thuận tiện cho lịch trình của bạn hơn? Hãy chia sẻ với MY VICI nhé!`;
+    }
+
+    // Câu hỏi lịch học tổng quát
+    return `Namaste bạn! Dưới đây là **Thời Khóa Biểu các lớp tập tại VICI Yoga Therapy Training Center** (từ Thứ 2 đến Thứ 7):
+
+🌅 **CÁC CA SÁNG:**
+* **05:00 – 06:00:** Lớp *Yoga For Newbie* (Nhẹ nhàng, đánh thức cơ thể, nạp năng lượng đón bình minh).
+* **06:30 – 07:30:** Lớp *Trị Liệu Chuyên Đề Sáng* (T2: Kéo giãn | T3: Mở hông | T4: Mở vai & Lưng trên | T5: Vặn xoắn | T6: Thăng bằng).
+* **08:00 – 09:00:** Lớp *Yoga Dòng Chảy & Cột Sống* (Cân bằng giữa hơi thở, thể lực và bảo vệ cột sống: Hatha, Vinyasa, Yin).
+* **09:00 – 12:00:** Khóa *Đào Tạo HLV Yoga Quốc Tế E-RYT 500 / YACEP* (T2 - T4 - T6, trực tiếp Master Henry Phan).
+
+☀️ **CA CHIỀU:**
+* **14:00 – 15:30:** Lớp *Yoga Nâng Cao Ashtanga & Cột Sống* (10 chuyên đề chuyên sâu của Master Henry Phan, T3 & T5).
+
+🌆 **CÁC CA TỐI (Thuận tiện sau giờ làm việc):**
+* **17:45 – 18:45:** Lớp *Tan Ca Phục Hồi Thân Thể* (Xả stress, kéo giãn bó cơ và giải tỏa mỏi cổ vai gáy cho dân văn phòng).
+* **19:00 – 20:00:** Lớp *Yoga Buổi Tối & Trị Liệu Chuông Xoay* (T2, T4, T6: Lớp Newbie | T3: Gentle Yoga | T5: Trị liệu Chuông xoay Tây Tạng giúp ngủ sâu giấc).
+
+🌿 **DỊCH VỤ 1-1 & CUỐI TUẦN:**
+* **Scan Trị Liệu Cơ - Vai - Cổ - Gáy 1-1 (45-60 phút, 650k):** Đặt lịch linh hoạt theo khung giờ riêng của bạn.
+* **Workshop Chuông Xoay Chữa Lành:** Tổ chức định kỳ vào sáng Thứ 7 (tuần thứ 2 & thứ 4 hàng tháng).
+
+Bạn thuận tiện tham gia vào khung giờ nào nhất (sáng sớm, ca chiều hay ca tối sau giờ làm) để MY VICI tư vấn chi tiết lớp học phù hợp cho bạn nhé?`;
+  }
+
+  // 2. CÂU HỎI TƯ VẤN CHUNG / TƯ VẤN GIÚP TÔI / BẮT ĐẦU TỪ ĐÂU
   const isGeneralConsultation =
     lower === 'tư vấn' ||
     lower === 'tư vấn giúp tôi' ||
@@ -129,16 +232,17 @@ Khi đĩa đệm bị chèn ép hoặc nhân nhầy phình ra, nó kích thích 
 Bạn có đang bị tê lan xuống hông hay bắp chân không? Hãy chia sẻ thêm để MY VICI tư vấn chi tiết hơn nhé!`;
   }
 
-  // 3. CỔ - VAI - GÁY, GÙ LƯNG, TÊ TAY, HỘI CHỨNG VĂN PHÒNG
+  // 3. CỔ - VAI - GÁY, GÙ LƯNG, TÊ TAY, HỘI CHỨNG VĂN PHÒNG (BỆNH LÝ / ĐAU MỎI)
   if (
     lower.includes('vai gáy') ||
-    lower.includes('cổ') ||
+    lower.includes('đau cổ') ||
+    lower.includes('mỏi cổ') ||
     lower.includes('bả vai') ||
     lower.includes('tê tay') ||
     lower.includes('gù lưng') ||
-    lower.includes('văn phòng') ||
-    lower.includes('mỏi cổ') ||
-    lower.includes('ngồi nhiều')
+    lower.includes('chéo trên') ||
+    (lower.includes('văn phòng') && (lower.includes('đau') || lower.includes('mỏi') || lower.includes('bệnh') || lower.includes('gáy') || lower.includes('hội chứng'))) ||
+    (lower.includes('ngồi nhiều') && (lower.includes('đau') || lower.includes('mỏi') || lower.includes('tê') || lower.includes('mệt')))
   ) {
     return `Namaste bạn! Tình trạng đau mỏi Cổ - Vai - Gáy và tê tay là dấu hiệu điển hình của **Hội chứng Chéo Trên (Upper Crossed Syndrome)** rất phổ biến ở người ngồi máy tính nhiều:
 

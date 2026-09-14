@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
-import { X, Send, Sparkles, Bot, User, ShieldAlert, CheckCircle2, RotateCcw, ArrowRight, Calendar, PhoneCall } from 'lucide-react';
+import { X, Send, Sparkles, Bot, User, ShieldAlert, CheckCircle2, RotateCcw, ArrowRight, Calendar, PhoneCall, Info, Check } from 'lucide-react';
 import { Lead } from '../types';
 import { getViciConsultation } from '../data/viciAdvisor';
 
@@ -8,6 +8,10 @@ interface Message {
   sender: 'ai' | 'user' | 'system';
   text: string;
   timestamp: string;
+  source?: 'gemini' | 'local_expert' | 'error';
+  model?: string;
+  notice?: string;
+  isStreaming?: boolean;
 }
 
 // Helper to render inline formatting like **bold**
@@ -25,8 +29,8 @@ function renderInlineStyles(str: string) {
   });
 }
 
-// Helper to render markdown-like structured text
-function renderMessageContent(text: string, isAI: boolean) {
+// Helper to render markdown-like structured text with typing cursor support
+function renderMessageContent(text: string, isAI: boolean, isStreaming?: boolean) {
   if (!isAI) {
     return <span className="whitespace-pre-wrap leading-relaxed">{text}</span>;
   }
@@ -36,6 +40,8 @@ function renderMessageContent(text: string, isAI: boolean) {
     <div className="space-y-1.5 leading-relaxed text-xs sm:text-sm">
       {lines.map((line, idx) => {
         const trimmed = line.trim();
+        const isLastLine = idx === lines.length - 1;
+
         if (!trimmed) {
           return <div key={idx} className="h-1" />;
         }
@@ -49,6 +55,9 @@ function renderMessageContent(text: string, isAI: boolean) {
               className="font-bold text-[#8A6437] text-xs sm:text-sm pt-2 pb-0.5 border-b border-[#F0E6D2] font-serif-display"
             >
               {renderInlineStyles(headingText)}
+              {isLastLine && isStreaming && (
+                <span className="inline-block w-1.5 h-3.5 bg-[#D69A2D] animate-pulse ml-1 align-middle" />
+              )}
             </h4>
           );
         }
@@ -59,7 +68,12 @@ function renderMessageContent(text: string, isAI: boolean) {
           return (
             <div key={idx} className="flex items-start gap-2 pl-1 text-[#2E332A]">
               <span className="text-[#D69A2D] font-bold text-xs mt-0.5 shrink-0">•</span>
-              <div className="flex-1">{renderInlineStyles(bulletText)}</div>
+              <div className="flex-1">
+                {renderInlineStyles(bulletText)}
+                {isLastLine && isStreaming && (
+                  <span className="inline-block w-1.5 h-3.5 bg-[#D69A2D] animate-pulse ml-1 align-middle" />
+                )}
+              </div>
             </div>
           );
         }
@@ -72,7 +86,12 @@ function renderMessageContent(text: string, isAI: boolean) {
               <span className="text-[#8A6437] font-semibold text-xs mt-0.5 shrink-0 min-w-[16px]">
                 {numMatch[1]}.
               </span>
-              <div className="flex-1">{renderInlineStyles(numMatch[2])}</div>
+              <div className="flex-1">
+                {renderInlineStyles(numMatch[2])}
+                {isLastLine && isStreaming && (
+                  <span className="inline-block w-1.5 h-3.5 bg-[#D69A2D] animate-pulse ml-1 align-middle" />
+                )}
+              </div>
             </div>
           );
         }
@@ -81,6 +100,9 @@ function renderMessageContent(text: string, isAI: boolean) {
         return (
           <p key={idx} className="text-[#252822]">
             {renderInlineStyles(trimmed)}
+            {isLastLine && isStreaming && (
+              <span className="inline-block w-1.5 h-3.5 bg-[#D69A2D] animate-pulse ml-1 align-middle" />
+            )}
           </p>
         );
       })}
@@ -150,9 +172,43 @@ export default function AIChatModal({
   const [leadConsent, setLeadConsent] = useState(true);
   const [leadSaved, setLeadSaved] = useState(false);
 
+  const [aiStatus, setAiStatus] = useState<'checking' | 'connected' | 'offline'>('checking');
+  const [vercelNotice, setVercelNotice] = useState<string | null>(null);
+  const [showVercelGuide, setShowVercelGuide] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const streamTimerRef = useRef<any>(null);
+
+  // Check backend health & Gemini status on mount/open
+  useEffect(() => {
+    if (isOpen) {
+      fetch('/api/health')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.geminiAvailable) {
+            setAiStatus('connected');
+            setVercelNotice(null);
+          } else {
+            setAiStatus('offline');
+            setVercelNotice(data?.notice || 'Chưa phát hiện GEMINI_API_KEY. Trợ lý đang dùng dữ liệu tri thức tĩnh.');
+          }
+        })
+        .catch(() => {
+          setAiStatus('offline');
+          setVercelNotice('Đang chạy ở chế độ độc lập (Client Offline). Dữ liệu phản hồi từ bộ quy chuẩn VICI.');
+        });
+    }
+
+    return () => {
+      if (streamTimerRef.current) {
+        clearInterval(streamTimerRef.current);
+      }
+    };
+  }, [isOpen]);
 
   const quickButtons = [
+    { label: '⏰ Lớp cho người làm 8h - 18h', prompt: 'Tôi là nhân viên văn phòng, làm từ 8h sáng đến 6h tối, có lớp nào phù hợp cho tôi không?' },
+    { label: '📅 Thời khóa biểu các lớp', prompt: 'Cho tôi xem lịch các lớp học trong tuần tại VICI' },
     { label: '🧘 Tư vấn lộ trình', prompt: 'Tư vấn giúp tôi lộ trình tập luyện phù hợp tại VICI' },
     { label: '🌿 Người mới bắt đầu', prompt: 'Tôi chưa từng tập Yoga, cơ thể cứng thì có lớp nào phù hợp cho người mới?' },
     { label: '🩺 Thoát vị đĩa đệm L4-L5', prompt: 'Tôi bị thoát vị đĩa đệm L4-L5 thì có tập yoga được không và cần lưu ý gì?' },
@@ -161,7 +217,7 @@ export default function AIChatModal({
     { label: '🔔 Chuông xoay & Mất ngủ', prompt: 'Tôi bị mất ngủ và căng thẳng kéo dài, liệu pháp Chuông xoay và Yoga phục hồi tác dụng ra sao?' },
     { label: '🔥 Ashtanga 10 chuyên đề', prompt: 'Cho tôi thông tin 10 chuyên đề Ashtanga nâng cao của Master Henry Phan' },
     { label: '🎓 Đào tạo HLV Quốc Tế', prompt: 'Tôi quan tâm đến khóa Đào tạo Huấn Luyện Viên Yoga Quốc Tế E-RYT 500 cấp bằng Yoga Alliance' },
-    { label: '💰 Học phí & Lịch học', prompt: 'Cho tôi biết bảng học phí các gói tập và thời khóa biểu tại VICI' },
+    { label: '💰 Bảng học phí các gói', prompt: 'Cho tôi biết bảng học phí các gói tập tại VICI' },
     { label: '📍 Địa chỉ & Hướng dẫn đi lại', prompt: 'Studio VICI ở đâu, có chỗ đậu xe ô tô không và giờ mở cửa thế nào?' },
     { label: '📞 Yêu cầu Master gọi lại', prompt: 'Tôi muốn để lại số điện thoại để Master gọi điện tư vấn 1-1 cho tôi' },
   ];
@@ -192,6 +248,21 @@ export default function AIChatModal({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading, showLeadFormInline]);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleSendMessage = async (textToSend?: string, currentHistory = messages) => {
     const query = (textToSend || inputValue).trim();
     if (!query || isLoading) return;
@@ -216,6 +287,10 @@ export default function AIChatModal({
       }));
 
       let aiReply = '';
+      let replySource: 'gemini' | 'local_expert' = 'local_expert';
+      let replyModel: string | undefined = undefined;
+      let replyNotice: string | undefined = undefined;
+
       try {
         const response = await fetch('/api/chat', {
           method: 'POST',
@@ -229,9 +304,18 @@ export default function AIChatModal({
         if (response.ok) {
           const data = await response.json();
           aiReply = (data.reply || '').trim();
+          replySource = data.source === 'gemini' ? 'gemini' : 'local_expert';
+          replyModel = data.model;
+          replyNotice = data.notice;
+          if (data.source === 'gemini') {
+            setAiStatus('connected');
+          }
+        } else if (response.status === 404) {
+          replyNotice = 'Hệ thống /api/chat chưa sẵn sàng trên Vercel. Trợ lý đang phản hồi từ phác đồ tri thức VICI.';
         }
       } catch (networkErr) {
         console.warn('Backend fetch notice, using local knowledge base:', networkErr);
+        replyNotice = 'Mất kết nối máy chủ AI. Đang hiển thị giải pháp từ CSDL tri thức offline của VICI.';
       }
 
       // If reply is empty, use our comprehensive consultation engine
@@ -239,14 +323,60 @@ export default function AIChatModal({
         aiReply = getViciConsultation(query);
       }
 
-      const aiMessage: Message = {
-        id: `ai-${Date.now()}`,
+      // Start realistic progressive typing reveal
+      const aiMsgId = `ai-${Date.now()}`;
+      const targetText = aiReply;
+      const finalSource = replySource;
+      const finalModel = replyModel;
+      const finalNotice = replyNotice;
+
+      setIsLoading(false);
+
+      // Add placeholder message with cursor
+      const initialAiMsg: Message = {
+        id: aiMsgId,
         sender: 'ai',
-        text: aiReply,
+        text: '',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        source: finalSource,
+        model: finalModel,
+        notice: finalNotice,
+        isStreaming: true,
       };
 
-      setMessages([...newHistory, aiMessage]);
+      setMessages([...newHistory, initialAiMsg]);
+
+      // Stream text chunks for realistic AI consulting feel
+      if (streamTimerRef.current) {
+        clearInterval(streamTimerRef.current);
+      }
+
+      let charIndex = 0;
+      const chunkSize = Math.max(12, Math.floor(targetText.length / 32));
+
+      streamTimerRef.current = setInterval(() => {
+        charIndex += chunkSize;
+        if (charIndex >= targetText.length) {
+          clearInterval(streamTimerRef.current);
+          streamTimerRef.current = null;
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === aiMsgId
+                ? { ...m, text: targetText, isStreaming: false }
+                : m
+            )
+          );
+        } else {
+          const currentChunk = targetText.slice(0, charIndex);
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === aiMsgId
+                ? { ...m, text: currentChunk, isStreaming: true }
+                : m
+            )
+          );
+        }
+      }, 22);
 
       // Only show inline lead form if the user explicitly asks to be contacted or called back
       const lowerQuery = query.toLowerCase();
@@ -269,9 +399,10 @@ export default function AIChatModal({
         sender: 'ai',
         text: fallbackReply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        source: 'local_expert',
+        notice: 'Đã chuyển sang CSDL tri thức nội bộ VICI.'
       };
       setMessages([...newHistory, fallbackAiMsg]);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -323,6 +454,10 @@ export default function AIChatModal({
   };
 
   const handleResetChat = () => {
+    if (streamTimerRef.current) {
+      clearInterval(streamTimerRef.current);
+      streamTimerRef.current = null;
+    }
     setMessages([]);
     setLeadSaved(false);
     setShowLeadFormInline(false);
@@ -331,6 +466,8 @@ export default function AIChatModal({
       sender: 'ai',
       text: `Namaste! 🙏 Tôi là MY VICI. Bạn cần tư vấn về lớp học trị liệu, khóa nâng cao hay đào tạo Huấn luyện viên?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      source: aiStatus === 'connected' ? 'gemini' : 'local_expert',
+      model: aiStatus === 'connected' ? 'gemini-3.6-flash' : undefined,
     };
     setMessages([welcomeMsg]);
   };
@@ -338,7 +475,14 @@ export default function AIChatModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="bg-[#FFFDF8] w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E8DFC8] overflow-hidden h-[92vh] sm:h-[85vh] flex flex-col">
         {/* Chat Header */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-[#8A6437] to-[#6A4B27] text-white flex items-center justify-between shadow-sm">
@@ -351,10 +495,23 @@ export default function AIChatModal({
                 <h3 className="font-bold text-sm sm:text-base font-serif-display">
                   MY VICI AI
                 </h3>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] bg-amber-900/40 text-amber-200 px-1.5 py-0.2 rounded border border-amber-400/30">
-                  E-RYT 500 Knowledge
-                </span>
+                {aiStatus === 'connected' ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/25 text-emerald-100 px-2 py-0.5 rounded-full border border-emerald-400/40">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Gemini AI Active
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowVercelGuide(!showVercelGuide)}
+                    className="inline-flex items-center gap-1 text-[10px] bg-amber-500/25 text-amber-100 px-2 py-0.5 rounded-full border border-amber-300/40 hover:bg-amber-500/35 transition-colors cursor-pointer"
+                    title="Bấm xem hướng dẫn cấu hình AI trên Vercel"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
+                    Tri thức VICI
+                    <Info className="w-3 h-3 ml-0.5 opacity-80" />
+                  </button>
+                )}
               </div>
               <p className="text-[11px] text-amber-100/80">
                 Trợ lý AI tư vấn cá nhân hóa • Định tuyến an toàn • Cột sống & Khớp
@@ -370,16 +527,53 @@ export default function AIChatModal({
             >
               <RotateCcw className="w-4 h-4" />
             </button>
-            <button
-              id="ai-chat-close-btn"
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-white/10 text-amber-200 transition-colors cursor-pointer"
-              aria-label="Đóng"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              <span className="hidden sm:inline-block text-[10px] bg-white/15 text-amber-100 px-1.5 py-0.5 rounded border border-white/20 font-mono select-none" title="Nhấn phím Esc để đóng">
+                Esc
+              </span>
+              <button
+                id="ai-chat-close-btn"
+                onClick={onClose}
+                className="p-2 rounded-full hover:bg-white/10 text-amber-200 transition-colors cursor-pointer"
+                aria-label="Đóng (Phím Esc)"
+                title="Đóng (Phím Esc)"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Collapsible Vercel Guidance Banner */}
+        {showVercelGuide && (
+          <div className="bg-[#FFF8EB] border-b border-amber-200 p-3 sm:p-4 text-xs text-[#5C451F] space-y-2 animate-in fade-in">
+            <div className="flex items-center justify-between font-bold text-[#8A6437]">
+              <div className="flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-[#D69A2D]" />
+                <span>Kích hoạt Gemini AI khi deploy lên Vercel</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowVercelGuide(false)}
+                className="text-gray-400 hover:text-gray-600 cursor-pointer p-0.5"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <p className="text-[11px] leading-relaxed">
+              Dự án đã tích hợp sẵn <strong>Vercel Serverless Functions</strong> tại <code className="bg-amber-200/50 px-1 py-0.5 rounded text-[10px] font-mono">/api/chat</code>. Để trợ lý kết nối trực tiếp với mô hình Gemini mới nhất:
+            </p>
+            <ol className="list-decimal list-inside text-[11px] space-y-1 pl-1">
+              <li>Mở <strong>Vercel Dashboard</strong> &rarr; Chọn Project của bạn.</li>
+              <li>Vào tab <strong>Settings</strong> &rarr; chọn mục <strong>Environment Variables</strong>.</li>
+              <li>Thêm biến Key: <code className="bg-white px-1.5 py-0.5 rounded border border-amber-300 font-mono text-emerald-800 font-bold">GEMINI_API_KEY</code> với giá trị API Key của bạn.</li>
+              <li>Bấm <strong>Save</strong> rồi nhấn <strong>Redeploy</strong> bản mới nhất.</li>
+            </ol>
+            <div className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-2 font-medium">
+              ✓ Sau khi thêm biến, huy hiệu trên header sẽ sáng xanh <strong>Gemini AI Active</strong> và câu trả lời sẽ được tạo động theo thời gian thực!
+            </div>
+          </div>
+        )}
 
         {/* Medical disclaimer note bar */}
         <div className="bg-amber-50 px-4 py-1.5 border-b border-amber-200/60 flex items-center gap-2 text-[11px] text-[#6E5928]">
@@ -411,10 +605,10 @@ export default function AIChatModal({
                       : 'bg-[#8A6437] text-white shadow-xs'
                   }`}
                 >
-                  {renderMessageContent(msg.text, isAI)}
+                  {renderMessageContent(msg.text, isAI, msg.isStreaming)}
 
                   {/* Course recommendation 1-click CTA button */}
-                  {isAI && msg.id !== 'welcome-msg' && msg.id !== 'welcome-reset' && (() => {
+                  {isAI && msg.id !== 'welcome-msg' && msg.id !== 'welcome-reset' && !msg.isStreaming && (() => {
                     const recommendation = detectCourseRecommendation(msg.text);
                     if (!recommendation) return null;
                     return (
@@ -439,13 +633,40 @@ export default function AIChatModal({
                     );
                   })()}
 
-                  <div
-                    className={`text-[10px] mt-2 text-right ${
-                      isAI ? 'text-gray-400' : 'text-amber-200/70'
-                    }`}
-                  >
-                    {msg.timestamp}
-                  </div>
+                  {/* AI Source attribution tag */}
+                  {isAI && msg.id !== 'welcome-msg' && msg.id !== 'welcome-reset' && (
+                    <div className="mt-2.5 pt-2 border-t border-[#F0E6D2] flex flex-wrap items-center justify-between gap-1.5">
+                      {msg.source === 'gemini' ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          <Sparkles className="w-3 h-3 text-emerald-600" />
+                          Tư vấn trực tiếp bởi Google Gemini ({msg.model || '3.6-flash'})
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#8A6437] bg-[#FAF5EB] px-2 py-0.5 rounded-full border border-[#E2D4BD]">
+                          📚 Phác đồ chuyên gia VICI E-RYT 500 (Offline Engine)
+                        </span>
+                      )}
+
+                      <span className="text-[10px] text-gray-400">{msg.timestamp}</span>
+                    </div>
+                  )}
+
+                  {/* Operational Notice if any */}
+                  {isAI && msg.notice && !msg.isStreaming && (
+                    <div className="mt-2 text-[10px] text-amber-900 bg-amber-50/90 p-2 rounded-xl border border-amber-200/70 leading-normal flex items-start gap-1.5">
+                      <Info className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-semibold">Lưu ý Vercel: </span>
+                        <span>{msg.notice}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {!isAI && (
+                    <div className="text-[10px] mt-2 text-right text-amber-200/70">
+                      {msg.timestamp}
+                    </div>
+                  )}
                 </div>
 
                 {!isAI && (

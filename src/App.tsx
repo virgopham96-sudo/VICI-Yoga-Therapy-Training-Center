@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Stats from './components/Stats';
@@ -55,6 +55,21 @@ export default function App() {
       setToastNotification(null);
     }, 6000);
   };
+
+  // Global Escape key listener for closing active overlays
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isAIChatOpen) {
+          setIsAIChatOpen(false);
+        } else if (toastNotification) {
+          setToastNotification(null);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAIChatOpen, toastNotification]);
 
   return (
     <div className="min-h-screen bg-[#FFFDF8] text-[#252822] font-sans antialiased selection:bg-[#D69A2D]/20 selection:text-[#8A6437]">

@@ -60,12 +60,18 @@ export async function processChatConsultation(
   const ai = getGeminiClient();
 
   if (ai) {
-    // Verified working models for Google GenAI v2.4+
+    // Prioritize gemini-2.5 for cost optimization, with low-cost Flash-Lite fallbacks
+    const configuredModel = process.env.GEMINI_MODEL?.trim();
     const candidateModels = [
-      'gemini-3.6-flash',
+      ...(configuredModel ? [configuredModel] : []),
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
+      'gemini-flash-lite-latest',
+      'gemini-3.1-flash-lite',
       'gemini-3.5-flash-lite',
-      'gemini-2.5-flash'
-    ];
+      'gemini-flash-latest',
+      'gemini-3.6-flash'
+    ].filter((m, idx, arr) => arr.indexOf(m) === idx);
 
     const contents: Array<{ role: 'user' | 'model'; parts: Array<any> }> = [];
 
@@ -106,7 +112,8 @@ export async function processChatConsultation(
           contents,
           config: {
             systemInstruction: VICI_CARE_SYSTEM_PROMPT,
-            temperature: 0.5,
+            temperature: 0.35,
+            maxOutputTokens: 650,
             tools: [VICI_CARE_TOOL as any]
           }
         });
@@ -149,7 +156,8 @@ export async function processChatConsultation(
                 contents: followUpContents,
                 config: {
                   systemInstruction: VICI_CARE_SYSTEM_PROMPT,
-                  temperature: 0.5
+                  temperature: 0.35,
+                  maxOutputTokens: 650
                 }
               });
 

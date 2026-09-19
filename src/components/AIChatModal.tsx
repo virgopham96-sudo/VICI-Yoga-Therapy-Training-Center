@@ -545,7 +545,7 @@ Bạn đang gặp phải tình trạng đau mỏi ở vị trí nào (cổ vai g
       text: `Namaste! 🙏 Mình là **Vici Care**. Bạn đang gặp tình trạng đau mỏi ở vị trí nào hay cần tư vấn lộ trình phục hồi, lớp nhóm nhỏ hay kèm PT 1:1?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       source: aiStatus === 'connected' ? 'gemini' : 'local_expert',
-      model: aiStatus === 'connected' ? 'gemini-3.6-flash' : undefined,
+      model: aiStatus === 'connected' ? 'gemini-2.5-flash' : undefined,
     };
     setMessages([welcomeMsg]);
   };
@@ -717,7 +717,7 @@ Bạn đang gặp phải tình trạng đau mỏi ở vị trí nào (cổ vai g
                       {msg.source === 'gemini' ? (
                         <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                           <Sparkles className="w-3 h-3 text-emerald-600" />
-                          Tư vấn trực tiếp bởi Google Gemini ({msg.model || '3.6-flash'})
+                          Tư vấn trực tiếp bởi Google Gemini ({msg.model ? msg.model.replace('models/', '') : 'gemini-2.5-flash'})
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#8A6437] bg-[#FAF5EB] px-2 py-0.5 rounded-full border border-[#E2D4BD]">

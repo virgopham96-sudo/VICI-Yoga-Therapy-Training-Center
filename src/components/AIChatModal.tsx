@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
 import { X, Send, Sparkles, Bot, User, ShieldAlert, CheckCircle2, RotateCcw, ArrowRight, Calendar, PhoneCall, Info, Check, FileSpreadsheet } from 'lucide-react';
 import { Lead } from '../types';
-import { getViciConsultation } from '../data/viciAdvisor';
+import { getViciConsultation, extractLeadFromText } from '../data/viciAdvisor';
 import { syncLeadToGoogleSheet } from '../services/googleSheetsService';
 
 interface Message {
@@ -114,6 +114,18 @@ function renderMessageContent(text: string, isAI: boolean, isStreaming?: boolean
 // Detect recommended course for 1-click CTA button
 function detectCourseRecommendation(text: string): { label: string; courseName: string } | null {
   const lower = text.toLowerCase();
+  if (lower.includes('rom test') || lower.includes('tầm vận động') || lower.includes('tập thử') || lower.includes('trải nghiệm')) {
+    return {
+      label: 'Đặt lịch Kiểm tra Tầm Vận Động (ROM Test)',
+      courseName: 'Kiểm Tra Tầm Vận Động (ROM Test) & Trải Nghiệm Buổi Tập Thử',
+    };
+  }
+  if (lower.includes('1:1') || lower.includes('pt') || lower.includes('cá nhân hóa')) {
+    return {
+      label: 'Đăng ký Lớp Kèm 1:1 Cá Nhân Hóa (PT)',
+      courseName: 'Lớp Huấn Luyện Cá Nhân 1:1 (PT Trị Liệu)',
+    };
+  }
   if (lower.includes('scan trị liệu')) {
     return {
       label: 'Đặt lịch Scan Trị Liệu Cơ Vai Cổ Gáy (650k)',
@@ -208,19 +220,17 @@ export default function AIChatModal({
   }, [isOpen]);
 
   const quickButtons = [
-    { label: '⏰ Lớp cho người làm 8h - 18h', prompt: 'Tôi là nhân viên văn phòng, làm từ 8h sáng đến 6h tối, có lớp nào phù hợp cho tôi không?' },
-    { label: '📅 Thời khóa biểu các lớp', prompt: 'Cho tôi xem lịch các lớp học trong tuần tại VICI' },
-    { label: '🧘 Tư vấn lộ trình', prompt: 'Tư vấn giúp tôi lộ trình tập luyện phù hợp tại VICI' },
-    { label: '🌿 Người mới bắt đầu', prompt: 'Tôi chưa từng tập Yoga, cơ thể cứng thì có lớp nào phù hợp cho người mới?' },
-    { label: '🩺 Thoát vị đĩa đệm L4-L5', prompt: 'Tôi bị thoát vị đĩa đệm L4-L5 thì có tập yoga được không và cần lưu ý gì?' },
-    { label: '💻 Đau mỏi Cổ - Vai - Gáy', prompt: 'Tôi bị đau mỏi vai gáy và tê tay do làm việc văn phòng, tôi nên bắt đầu từ đâu?' },
-    { label: '👴 Người trên 50 tuổi / Khớp yếu', prompt: 'Tôi trên 50 tuổi chưa từng tập thể thao, cơ thể cứng thì có lớp nào an toàn?' },
-    { label: '🔔 Chuông xoay & Mất ngủ', prompt: 'Tôi bị mất ngủ và căng thẳng kéo dài, liệu pháp Chuông xoay và Yoga phục hồi tác dụng ra sao?' },
-    { label: '🔥 Ashtanga 10 chuyên đề', prompt: 'Cho tôi thông tin 10 chuyên đề Ashtanga nâng cao của Master Henry Phan' },
-    { label: '🎓 Đào tạo HLV Quốc Tế', prompt: 'Tôi quan tâm đến khóa Đào tạo Huấn Luyện Viên Yoga Quốc Tế E-RYT 500 cấp bằng Yoga Alliance' },
-    { label: '💰 Bảng học phí các gói', prompt: 'Cho tôi biết bảng học phí các gói tập tại VICI' },
-    { label: '📍 Địa chỉ & Hướng dẫn đi lại', prompt: 'Studio VICI ở đâu, có chỗ đậu xe ô tô không và giờ mở cửa thế nào?' },
-    { label: '📞 Yêu cầu Master gọi lại', prompt: 'Tôi muốn để lại số điện thoại để Master gọi điện tư vấn 1-1 cho tôi' },
+    { label: '🩺 Thoát vị đĩa đệm L4-L5 có tập được không?', prompt: 'Mình bị thoát vị đĩa đệm L4-L5 có tập yoga bên bạn được không? Có sợ đau thêm không?' },
+    { label: '💻 Đau mỏi cổ vai gáy, tê cánh tay văn phòng', prompt: 'Ngồi máy tính nhiều bị nhức mỏi hai bên bả vai và tê tê cánh tay, bên mình có bài tập nào hỗ trợ không?' },
+    { label: '💰 Học phí & ưu đãi buổi trải nghiệm', prompt: 'Học phí tại Vici Yoga bao nhiêu một tháng vậy?' },
+    { label: '📋 Đặt lịch kiểm tra tầm vận động (ROM test)', prompt: 'Tôi muốn đăng ký kiểm tra tầm vận động ROM test và trải nghiệm buổi tập thử' },
+    { label: '🧘 Lớp trị liệu nhóm nhỏ hay kèm PT 1:1?', prompt: 'Tôi nên chọn lớp trị liệu nhóm nhỏ hay lớp kèm PT 1:1 cá nhân hóa?' },
+    { label: '⏰ Lớp cho người làm văn phòng 8h - 18h', prompt: 'Tôi là nhân viên văn phòng, làm từ 8h sáng đến 6h tối, có lớp nào phù hợp cho tôi không?' },
+    { label: '🌿 Người mới bắt đầu, cơ thể cứng', prompt: 'Tôi chưa từng tập Yoga, cơ thể cứng thì có lớp nào phù hợp cho người mới?' },
+    { label: '🔔 Chuông xoay & Trị liệu mất ngủ, lo âu', prompt: 'Tôi bị mất ngủ và căng thẳng kéo dài, liệu pháp Chuông xoay và Yoga phục hồi tác dụng ra sao?' },
+    { label: '🔥 Ashtanga 10 chuyên đề Master Henry Phan', prompt: 'Cho tôi thông tin 10 chuyên đề Ashtanga nâng cao của Master Henry Phan' },
+    { label: '🎓 Đào tạo HLV Quốc Tế E-RYT 500', prompt: 'Tôi quan tâm đến khóa Đào tạo Huấn Luyện Viên Yoga Quốc Tế E-RYT 500 cấp bằng Yoga Alliance' },
+    { label: '📍 Địa chỉ Studio & Thời khóa biểu', prompt: 'Cho tôi xem địa chỉ Studio VICI và lịch các lớp học trong tuần' },
   ];
 
   // Initialize or reset chat on open
@@ -230,7 +240,12 @@ export default function AIChatModal({
         const welcomeMsg: Message = {
           id: 'welcome-msg',
           sender: 'ai',
-          text: `Namaste! 🙏 Chào mừng bạn đến với VICI Yoga Therapy Training Center.\n\nTôi là **MY VICI**, trợ lý AI thông minh được huấn luyện dựa trên triết lý trị liệu và hệ thống đào tạo của Master Henry Phan.\n\nTôi có thể giúp bạn chọn lớp học phù hợp với thể trạng cơ xương khớp, giải đáp học phí, thời khóa biểu hoặc tư vấn khóa đào tạo Huấn luyện viên quốc tế. Bạn đang quan tâm đến mục tiêu nào nhất?`,
+          text: `Namaste! 🙏 Mình là **Vici Care** – Chuyên viên tư vấn phục hồi và trị liệu của Vici Yoga Therapy Center.
+
+Mình luôn ở đây để lắng nghe, đồng hành và hỗ trợ bạn cải thiện các vấn đề về cơ xương khớp, đĩa đệm, giải tỏa căng thẳng và phục hồi cột sống theo phương châm:
+* **"Tập đúng để chữa lành – Không ép dẻo quá đà – Tôn trọng giới hạn tự nhiên của cơ thể."**
+
+Bạn đang gặp phải tình trạng đau mỏi ở vị trí nào (cổ vai gáy, thắt lưng, gối...) hay đang quan tâm đến lớp học nào? Hãy chia sẻ cùng Vici Care nhé!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
         setMessages([welcomeMsg]);
@@ -311,6 +326,36 @@ export default function AIChatModal({
           if (data.source === 'gemini') {
             setAiStatus('connected');
           }
+
+          // Handle lead captured from function call or extraction
+          const captured = data?.capturedLead || extractLeadFromText(query);
+          if (captured && captured.phone && !leadSaved) {
+            const leadObj: Lead = {
+              id: `VICI-LEAD-${Date.now().toString().slice(-4)}`,
+              createdAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+              name: captured.fullName || 'Học viên tư vấn Vici Care',
+              phone: captured.phone,
+              source: 'Vici Care AI Advisor',
+              interest: captured.serviceInterest || 'Kiểm tra tầm vận động (ROM test)',
+              category: 'RECOVERY_THERAPY',
+              experience: 'Khảo sát qua Vici Care AI',
+              goals: [captured.healthCondition || 'Trị liệu phục hồi cột sống'],
+              preferredTime: captured.preferredTime || 'Linh hoạt',
+              preferredFormat: 'Trực tiếp tại Studio (Opal Boulevard)',
+              recommendedCourse: 'Kiểm Tra Tầm Vận Động (ROM Test) & Tập Thử',
+              leadScore: 'HOT',
+              status: 'New',
+              assignedTo: 'Master Mỹ Kiều',
+              conversationSummary: `Vici Care trích xuất: ${captured.healthCondition || 'Tư vấn trị liệu'}. Đăng ký: ${captured.serviceInterest || 'ROM test'}.`,
+              staffNotes: `Lead từ Vici Care AI. Số điện thoại: ${captured.phone}. Khung giờ mong muốn: ${captured.preferredTime || 'Linh hoạt'}.`,
+              nextAction: 'Liên hệ trong 5-10 phút để xác nhận lịch kiểm tra ROM test',
+              isSampleData: false,
+            };
+
+            if (onLeadCaptured) onLeadCaptured(leadObj);
+            syncLeadToGoogleSheet(leadObj).catch((err) => console.warn('Sheet sync notice:', err));
+            setLeadSaved(true);
+          }
         } else if (response.status === 404) {
           replyNotice = 'Hệ thống /api/chat chưa sẵn sàng trên Vercel. Trợ lý đang phản hồi từ phác đồ tri thức VICI.';
         }
@@ -322,6 +367,37 @@ export default function AIChatModal({
       // If reply is empty, use our comprehensive consultation engine
       if (!aiReply) {
         aiReply = getViciConsultation(query);
+      }
+
+      // Check offline lead extraction if not already saved
+      if (!leadSaved) {
+        const localCaptured = extractLeadFromText(query);
+        if (localCaptured && localCaptured.phone) {
+          const leadObj: Lead = {
+            id: `VICI-LEAD-${Date.now().toString().slice(-4)}`,
+            createdAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+            name: localCaptured.fullName || 'Học viên tư vấn Vici Care',
+            phone: localCaptured.phone,
+            source: 'Vici Care AI Advisor',
+            interest: localCaptured.serviceInterest || 'Kiểm tra tầm vận động (ROM test)',
+            category: 'RECOVERY_THERAPY',
+            experience: 'Khảo sát qua Vici Care AI',
+            goals: [localCaptured.healthCondition || 'Trị liệu phục hồi cột sống'],
+            preferredTime: localCaptured.preferredTime || 'Linh hoạt',
+            preferredFormat: 'Trực tiếp tại Studio (Opal Boulevard)',
+            recommendedCourse: 'Kiểm Tra Tầm Vận Động (ROM Test) & Tập Thử',
+            leadScore: 'HOT',
+            status: 'New',
+            assignedTo: 'Master Mỹ Kiều',
+            conversationSummary: `Vici Care trích xuất: ${localCaptured.healthCondition || 'Tư vấn trị liệu'}. Đăng ký: ${localCaptured.serviceInterest || 'ROM test'}.`,
+            staffNotes: `Lead từ Vici Care AI. Số điện thoại: ${localCaptured.phone}. Khung giờ mong muốn: ${localCaptured.preferredTime || 'Linh hoạt'}.`,
+            nextAction: 'Liên hệ trong 5-10 phút để xác nhận lịch kiểm tra ROM test',
+            isSampleData: false,
+          };
+          if (onLeadCaptured) onLeadCaptured(leadObj);
+          syncLeadToGoogleSheet(leadObj).catch((err) => console.warn('Sheet sync notice:', err));
+          setLeadSaved(true);
+        }
       }
 
       // Start realistic progressive typing reveal
@@ -466,7 +542,7 @@ export default function AIChatModal({
     const welcomeMsg: Message = {
       id: 'welcome-reset',
       sender: 'ai',
-      text: `Namaste! 🙏 Tôi là MY VICI. Bạn cần tư vấn về lớp học trị liệu, khóa nâng cao hay đào tạo Huấn luyện viên?`,
+      text: `Namaste! 🙏 Mình là **Vici Care**. Bạn đang gặp tình trạng đau mỏi ở vị trí nào hay cần tư vấn lộ trình phục hồi, lớp nhóm nhỏ hay kèm PT 1:1?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       source: aiStatus === 'connected' ? 'gemini' : 'local_expert',
       model: aiStatus === 'connected' ? 'gemini-3.6-flash' : undefined,
@@ -495,7 +571,7 @@ export default function AIChatModal({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-sm sm:text-base font-serif-display">
-                  MY VICI AI
+                  Vici Care
                 </h3>
                 {aiStatus === 'connected' ? (
                   <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/25 text-emerald-100 px-2 py-0.5 rounded-full border border-emerald-400/40">
@@ -510,13 +586,13 @@ export default function AIChatModal({
                     title="Bấm xem hướng dẫn cấu hình AI trên Vercel"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
-                    Tri thức VICI
+                    Vici Care Trị Liệu
                     <Info className="w-3 h-3 ml-0.5 opacity-80" />
                   </button>
                 )}
               </div>
               <p className="text-[11px] text-amber-100/80">
-                Trợ lý AI tư vấn cá nhân hóa • Định tuyến an toàn • Cột sống & Khớp
+                Chuyên viên tư vấn phục hồi & trị liệu VICI Yoga • Định tuyến an toàn & ROM test
               </p>
             </div>
           </div>

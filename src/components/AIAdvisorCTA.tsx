@@ -6,11 +6,11 @@ interface AIAdvisorCTAProps {
 
 export default function AIAdvisorCTA({ onOpenAIChat }: AIAdvisorCTAProps) {
   const quickPills = [
-    'Tôi mới bắt đầu Yoga',
-    'Tôi quan tâm Yoga Therapy vai gáy',
-    'Tôi muốn học Ashtanga nâng cao',
-    'Tôi muốn trở thành HLV Yoga',
-    'Tôi muốn xem học phí & lịch học',
+    'Thoát vị đĩa đệm L4-L5',
+    'Đau mỏi cổ vai gáy, tê tay',
+    'Đặt lịch kiểm tra ROM test',
+    'Lớp trị liệu nhóm nhỏ hay PT 1:1?',
+    'Học phí & ưu đãi trải nghiệm',
   ];
 
   return (
@@ -25,15 +25,15 @@ export default function AIAdvisorCTA({ onOpenAIChat }: AIAdvisorCTAProps) {
             <div className="text-center md:text-left max-w-xl">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-amber-200 text-xs font-semibold uppercase tracking-wider mb-4 border border-white/20">
                 <Bot className="w-3.5 h-3.5" />
-                <span>MY VICI AI • Trợ lý tư vấn thông minh</span>
+                <span>Vici Care • Trợ Lý AI Tư Vấn Trị Liệu</span>
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-bold font-serif-display text-white mb-3">
-                Chưa biết chương trình nào phù hợp với bạn?
+                Bạn đang băn khoăn về thể trạng hay cột sống?
               </h3>
 
               <p className="text-amber-100/90 text-sm sm:text-base leading-relaxed mb-6">
-                Chỉ cần 1 phút trò chuyện, MY VICI sẽ lắng nghe mục tiêu, tình trạng cơ xương khớp của bạn và gợi ý chính xác lớp học tối ưu nhất.
+                Chỉ cần 1 phút trò chuyện, Vici Care sẽ lắng nghe thấu cảm, giải thích góc nhìn giải phẫu học và tư vấn buổi kiểm tra tầm vận động (ROM test) phù hợp nhất cho bạn.
               </p>
 
               {/* Quick Prompt Pills */}
@@ -58,7 +58,7 @@ export default function AIAdvisorCTA({ onOpenAIChat }: AIAdvisorCTAProps) {
                 className="inline-flex items-center gap-2.5 px-7 py-4 rounded-full bg-[#D69A2D] text-white font-bold text-sm sm:text-base hover:bg-[#B87A14] shadow-lg hover:shadow-xl transition-all cursor-pointer group"
               >
                 <Sparkles className="w-5 h-5 text-amber-200" />
-                <span>Bắt đầu trò chuyện cùng MY VICI</span>
+                <span>Trò chuyện cùng Vici Care</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>

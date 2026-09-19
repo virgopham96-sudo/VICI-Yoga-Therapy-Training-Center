@@ -65,7 +65,7 @@ export default function FAQ({ onOpenAIChat }: FAQProps) {
                         className="inline-flex items-center gap-1 text-xs text-[#D69A2D] hover:text-[#B87A14] font-medium cursor-pointer"
                       >
                         <Sparkles className="w-3 h-3" />
-                        <span>Hỏi sâu hơn với MY VICI</span>
+                        <span>Hỏi sâu hơn với Vici Care</span>
                       </button>
                     </div>
                   </div>
@@ -82,7 +82,7 @@ export default function FAQ({ onOpenAIChat }: FAQProps) {
             onClick={() => onOpenAIChat('Tôi muốn tư vấn về tình trạng bệnh lý cột sống')}
             className="text-[#8A6437] font-bold hover:underline cursor-pointer ml-1"
           >
-            Trò chuyện ngay với MY VICI
+            Trò chuyện ngay với Vici Care
           </button>
         </div>
       </div>

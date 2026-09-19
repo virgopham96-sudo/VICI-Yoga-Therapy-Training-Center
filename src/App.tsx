@@ -203,7 +203,7 @@ export default function App() {
                 <Sparkles className="w-4 h-4 text-[#E5B25D] group-hover:scale-110 transition-transform" />
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               </div>
-              <span>Hỏi MY VICI</span>
+              <span>Hỏi Vici Care</span>
             </button>
           </div>
         </main>

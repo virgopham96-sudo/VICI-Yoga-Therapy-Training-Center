@@ -57,7 +57,7 @@ export default function Hero({ onOpenAIChat, onOpenRegister }: HeroProps) {
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#FFFDF8] text-[#8A6437] font-semibold text-sm sm:text-base border border-[#DFCFAE] hover:border-[#D69A2D] hover:bg-[#F9F5EC] transition-all cursor-pointer shadow-2xs"
               >
                 <Sparkles className="w-4 h-4 text-[#D69A2D]" />
-                <span>Tư Vấn Cùng MY VICI</span>
+                <span>Tư Vấn Cùng Vici Care</span>
               </button>
             </div>
 

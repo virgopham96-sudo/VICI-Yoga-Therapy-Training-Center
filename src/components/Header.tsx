@@ -151,7 +151,7 @@ export default function Header({
               className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-full bg-[#D69A2D]/10 text-[#A66F17] hover:bg-[#D69A2D]/20 border border-[#D69A2D]/30 transition-all cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#D69A2D]" />
-              <span>Hỏi MY VICI</span>
+              <span>Hỏi Vici Care</span>
             </button>
 
             {/* Primary Consultation Registration CTA */}
@@ -215,7 +215,7 @@ export default function Header({
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#D69A2D]/10 text-[#A66F17] font-semibold border border-[#D69A2D]/30"
               >
                 <Sparkles className="w-4 h-4 text-[#D69A2D]" />
-                <span>Hỏi Trợ lý MY VICI</span>
+                <span>Hỏi Trợ lý Vici Care</span>
               </button>
 
               <button

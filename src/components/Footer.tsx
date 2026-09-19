@@ -109,7 +109,7 @@ export default function Footer({ onOpenRegister, onOpenAIChat }: FooterProps) {
                 onClick={onOpenAIChat}
                 className="text-xs text-[#E5B25D] hover:underline flex items-center gap-1 cursor-pointer"
               >
-                <span>Hỏi MY VICI để chọn khóa phù hợp →</span>
+                <span>Hỏi Vici Care để chọn khóa phù hợp →</span>
               </button>
             </div>
           </div>

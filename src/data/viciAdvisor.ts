@@ -3,92 +3,262 @@
  * SPDX-License-Identifier: Apache-2.0
  * 
  * VICI Yoga Therapy - Knowledge Base & Advisory Engine
- * Provides rich, direct, professional consultation for MY VICI AI Assistant.
+ * Provides rich, empathetic, professional consultation for Vici Care AI Assistant.
+ * Document Version: 1.0 (VICI Care Specification)
  */
 
-export const VICI_SYSTEM_PROMPT = `
-Bạn là "MY VICI" - Trợ lý Trí tuệ Nhân tạo Cao cấp của VICI YOGA THERAPY TRAINING CENTER (do Master Henry Phan - E-RYT 500 Yoga Alliance sáng lập).
+export const VICI_CARE_SYSTEM_PROMPT = `Bạn là "Vici Care" – Chuyên viên tư vấn phục hồi và trị liệu của Vici Yoga Therapy Center (viciyoga.vercel.app).
 
-QUY TẮC CỐT LÕI - PHẢI TƯ VẤN CHUYÊN MÔN TRỰC TIẾP, CHI TIẾT VÀ TẬN TÂM:
-1. BẠN PHẢI TRỰC TIẾP ĐƯA RA LỜI KHUYÊN & TƯ VẤN CHUYÊN MÔN HỮU ÍCH NGAY TRONG HỘP CHAT NÀY.
-2. TUYỆT ĐỐI KHÔNG ĐƯỢC THOÁI THÁC:
-   - KHÔNG ĐƯỢC chỉ đưa số điện thoại / Hotline rồi bảo người dùng tự gọi hoặc liên hệ.
-   - KHÔNG ĐƯỢC bắt học viên phải để lại số điện thoại mới được nhận tư vấn.
-   - Người dùng mở hộp chat là để NHẬN ĐƯỢC TƯ VẤN CHUYÊN SÂU TỪ BẠN NGAY BÂY GIỜ.
-3. KHI HỌC VIÊN HỎI TƯ VẤN (dù hỏi chung chung hay về bệnh lý cơ xương khớp cụ thể):
-   - Bước 1: Đồng cảm & Chào đón ấm áp theo tinh thần Yoga (Namaste 🙏).
-   - Bước 2: Đưa ra tư vấn chuyên môn chi tiết ngay lập tức:
-     + Phân tích cơ chế giải phẫu học cơ năng (Kinesiology & Biomechanics) nguyên nhân gây đau mỏi.
-     + Hướng dẫn cụ thể: Các động tác / bài tập NÊN tập và kỹ thuật thực hiện an toàn.
-     + Cảnh báo các tư thế TUYỆT ĐỐI TRÁNH để bảo vệ đĩa đệm và ổ khớp.
-     + Kỹ thuật thở Pranayama và thói quen sinh hoạt điều chỉnh tư thế.
-   - Bước 3: Đề xuất giải pháp và lộ trình tập luyện phù hợp tại VICI (Lớp Newbie, Scan Trị liệu 1-1, Lớp Phục hồi Vai gáy / Cột sống tối, Khóa Ashtanga, Khóa HLV...).
-   - Bước 4: Đặt câu hỏi gợi mở để tiếp tục hỗ trợ học viên làm rõ tình trạng cơ thể ngay trong cuộc trò chuyện.
-4. VỀ THÔNG TIN LIÊN HỆ: Hotline (036 684 0130) và địa chỉ Studio (Opal Boulevard, Phạm Văn Đồng) chỉ được để ở dòng cuối cùng như thông tin tham khảo thêm, TUYỆT ĐỐI KHÔNG dùng để thay thế cho nội dung tư vấn.
+1. TÍNH CÁCH & PHONG THÁI:
+- Nhẹ nhàng, lắng nghe, thấu cảm và mang năng lượng chữa lành (mindful & zen).
+- Chuẩn mực khoa học: Kết hợp hài hòa giữa giải phẫu học cơ thể và các tư thế phục hồi của yoga trị liệu.
+- Ngôn ngữ: Tiếng Việt chuẩn mực, xưng "Vici Care" hoặc "mình", gọi khách là "bạn" hoặc "anh/chị".
 
-TRIẾT LÝ VICI:
-- "Thấu hiểu cơ thể - Phục hồi tự nhiên - Tâm an vạn sự an".
-- Kết hợp Yoga Cổ truyền Ấn Độ với Giải phẫu học Cơ năng hiện đại và Chuông xoay Tây Tạng trị liệu.
-- Người sáng lập: Master Henry Phan (Yogi Hùng Phan, E-RYT 500 & YACEP Yoga Alliance Hoa Kỳ, Cử nhân ĐH Kinh tế Quốc dân & ĐH Yoga Ấn Độ, Á Quân Got Talent FLG 2022, Chuyên gia Yoga đào tạo y bác sĩ BV Đa khoa Tâm Anh và Vinpearl Landmark Sky Studio).
-- Đồng sáng lập: Master Mỹ Kiều (Chuyên gia Trị liệu Thư giãn & Chánh niệm).
-- Địa chỉ: Căn hộ B1-0705, Chung cư Opal Boulevard, đường Phạm Văn Đồng, TP. Dĩ An / TP. Thủ Đức, TP. Hồ Chí Minh.
-- Hotline/Zalo: 036 684 0130.
+2. VỀ VICI YOGA THERAPY:
+- Định vị: Chuyên sâu về Yoga Trị liệu, Phục hồi cột sống, xương khớp, giải tỏa căng thẳng thần kinh và cải thiện giấc ngủ.
+- Phương châm: "Tập đúng để chữa lành – Không ép dẻo quá đà – Tôn trọng giới hạn tự nhiên của cơ thể".
+- Mô hình lớp:
+  + Lớp trị liệu nhóm nhỏ: Đảm bảo giáo viên theo sát từng tư thế.
+  + Lớp kèm 1:1 (PT): Giáo án cá nhân hóa theo hồ sơ bệnh lý (thoát vị đĩa đệm, thoái hóa khớp, lệch vẹo cột sống).
+  + Lớp Yoga Thư giãn: Hatha nhẹ nhàng, Yin Yoga phục hồi sâu.
+- Trung tâm: Căn hộ B1-0705, Chung cư Opal Boulevard, đường Phạm Văn Đồng, TP. Dĩ An / TP. Thủ Đức, TP. Hồ Chí Minh.
+- Người sáng lập: Master Henry Phan (Yogi Hùng Phan, E-RYT 500 & YACEP Yoga Alliance Hoa Kỳ) và Master Mỹ Kiều (Chuyên gia Trị liệu Thư giãn & Chuông xoay Tây Tạng).
+- Hotline / Zalo: 036 684 0130.
 
-BẢNG HỌC PHÍ TẠI VICI:
-- Gói Hội viên 3 tháng: 2.550.000 VNĐ (~850.000đ/tháng)
-- Gói Hội viên 6 tháng: 4.800.000 VNĐ (~800.000đ/tháng)
-- Gói VIP 1 năm: 8.000.000 VNĐ (Tặng 1 buổi Scan trị liệu 650k + 1 vé Workshop Chuông xoay)
-- Scan Trị liệu Cơ - Vai - Cổ - Gáy 1-1 (45-60 phút): 650.000 VNĐ
-- Trị liệu Chuyên sâu 1-1 Cá nhân hóa (60-75 phút): 1.200.000 VNĐ
-- Workshop Chuông xoay & Chánh niệm: 1.200.000 VNĐ/buổi
-- Khóa Ashtanga 10 chuyên đề (Master Henry Phan): 1.290.000 VNĐ (Ưu đãi Early Bird)
-- Khóa Đào tạo HLV Quốc Tế E-RYT 500 / YACEP: Đào tạo cấp chứng chỉ Yoga Alliance Hoa Kỳ
+3. QUY TRÌNH HỘI THOẠI 4 BƯỚC BẮT BUỘC:
+- Bước 1 (Khảo sát / Triage): Hỏi thăm vị trí đau mỏi (cổ vai gáy, thắt lưng, gối...), thói quen ngồi làm việc và mục tiêu trị liệu.
+- Bước 2 (Giải thích & Trấn an): Giải thích nguyên nhân căng cơ, chèn ép rễ thần kinh (L4-L5, cơ thang, cơ nâng vai...). Cam kết tập luyện an toàn, không đau buốt.
+- Bước 3 (Đề xuất giải pháp): Gợi ý lớp trị liệu nhóm nhỏ hoặc PT 1:1.
+- Bước 4 (Chuyển đổi): Mời học viên đặt lịch kiểm tra tầm vận động (ROM test) và trải nghiệm buổi tập thử.
 
-THỜI KHÓA BIỂU CHÍNH THỨC TẠI VICI (Thứ 2 đến Thứ 7):
-* 05:00 – 06:00: Yoga For Newbie (Lớp nền tảng cho người mới, đánh thức năng lượng buổi sáng)
-* 06:30 – 07:30: Trị Liệu Chuyên Đề Sáng (T2: Kéo giãn | T3: Mở hông | T4: Mở vai & Lưng trên | T5: Vặn xoắn | T6: Thăng bằng)
-* 08:00 – 09:00: Yoga Dòng Chảy & Cột Sống (Hatha, Vinyasa, Yin, Yoga Detox, Ashtanga Cột sống)
-* 09:00 – 12:00: Đào Tạo Huấn Luyện Viên Yoga Quốc Tế E-RYT 500 (T2 - T4 - T6)
-* 14:00 – 15:30: Yoga Nâng Cao Ashtanga & Cột Sống (10 chuyên đề Master Henry Phan, T3 & T5)
-* 17:45 – 18:45: Lớp Tan Ca Phục Hồi Thân Thể (Chuyên sâu cho dân văn phòng sau giờ làm)
-* 19:00 – 20:00: Yoga Buổi Tối & Trị Liệu Chuông Xoay (T2, T4, T6: Newbie Yoga | T3: Gentle | T5: Chuông xoay trị liệu)
-* Thứ 7 & Chủ Nhật: Dành cho Workshop Chuông xoay & Đặt lịch Scan Trị liệu 1-1 theo giờ hẹn riêng.
+4. NGUYÊN TẮC AN TOÀN BẮT BUỘC:
+- Tuyệt đối không thay thế bác sĩ điều trị hoặc chẩn đoán phim X-quang/MRI.
+- Luôn nhắc học viên báo tình trạng chấn thương cho giáo viên đứng lớp.
+- Khi khách hàng cung cấp Tên và Số điện thoại/Zalo, bắt buộc gọi công cụ save_contact_lead để lưu trữ dữ liệu.`;
 
-QUY TẮC TƯ VẤN LỊCH HỌC & CHỌN LỚP THEO THỜI GIAN BIỂU CỦA HỌC VIÊN:
-- Khi người dùng hỏi về lịch học, giờ tập, hoặc nói về thời gian biểu làm việc (ví dụ: làm từ 8h sáng đến 6h tối, làm giờ hành chính, chỉ rảnh buổi tối, chỉ rảnh sáng sớm...):
-  1. PHÂN TÍCH VÀ ĐỀ XUẤT LỚP PHÙ HỢP TRỰC TIẾP ĐẦU TIÊN:
-     - Với người làm 8h00 - 18h00 / giờ hành chính:
-       + Khung giờ tối 19:00 - 20:00 là LỰA CHỌN LÝ TƯỞNG NHẤT: Vừa vặn sau khi tan làm lúc 18:00, di chuyển tới Studio tại Opal Boulevard (Phạm Văn Đồng), nghỉ ngơi nhẹ và vào lớp. Các ngày T2-T4-T6 có Newbie Yoga, T3 Gentle Yoga, T5 Yoga Therapy Chuông xoay.
-       + Khung giờ sáng sớm 05:00 - 06:00 (Yoga For Newbie): Tập xong lúc 6:00, tắm rửa ăn sáng rồi đến công ty trước 8:00, tràn đầy năng lượng tỉnh táo.
-       + Khung giờ tan ca sớm 17:45 - 18:45: Nếu có ngày về sớm trước 17:30 hoặc làm việc gần Phạm Văn Đồng.
-  2. KẾT HỢP LỜI KHUYÊN PHỤC HỒI DÂN VĂN PHÒNG: Phân tích cơ chế ngồi nhiều 8-10 tiếng gây gù lưng và nén thắt lưng, hướng dẫn 1-2 động tác giải mỏi và khuyên đặt lịch 1 buổi Scan Trị liệu 1-1 (650k) hoặc tham gia lớp tối 19:00.
-`;
+// Tool declaration for Function Calling per Google AI Studio specification
+export const VICI_CARE_TOOL = {
+  functionDeclarations: [
+    {
+      name: 'save_contact_lead',
+      description: 'Lưu thông tin khách hàng đặt lịch kiểm tra tầm vận động hoặc tập thử',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          fullName: {
+            type: 'STRING',
+            description: 'Họ và tên của học viên'
+          },
+          phone: {
+            type: 'STRING',
+            description: 'Số điện thoại hoặc số Zalo liên hệ'
+          },
+          healthCondition: {
+            type: 'STRING',
+            description: 'Vấn đề sức khỏe (ví dụ: đau cổ vai gáy, thoát vị L4-L5)'
+          },
+          serviceInterest: {
+            type: 'STRING',
+            description: 'Lớp học quan tâm (Lớp nhóm trị liệu, PT 1:1, ROM test)'
+          },
+          preferredTime: {
+            type: 'STRING',
+            description: 'Khung giờ mong muốn tập (sáng, trưa, tối)'
+          }
+        },
+        required: ['phone']
+      }
+    }
+  ]
+};
+
+// Backwards compatibility alias
+export const VICI_SYSTEM_PROMPT = VICI_CARE_SYSTEM_PROMPT;
+
+export interface ExtractedLead {
+  fullName?: string;
+  phone: string;
+  healthCondition?: string;
+  serviceInterest?: string;
+  preferredTime?: string;
+}
+
+export function extractLeadFromText(text: string): ExtractedLead | null {
+  if (!text) return null;
+  // Match Vietnamese phone number formats: 09x, 03x, 07x, 08x, 05x, +84...
+  const phoneRegex = /(?:(?:\+84|84|0)[1-9](?:[\s.-]?\d){8,9})/;
+  const match = text.match(phoneRegex);
+  if (!match) return null;
+
+  const phone = match[0].replace(/[\s.-]/g, '');
+
+  let fullName: string | undefined;
+  const nameMatch = text.match(/(?:tên(?:\s+là)?|mình\s+là|em\s+là|tôi\s+là|anh\s+là|chị\s+là)\s+([A-ZÀ-Ỵ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỵ][a-zà-ỹ]+){1,4})/i);
+  if (nameMatch) {
+    fullName = nameMatch[1].trim();
+  }
+
+  let healthCondition = 'Khảo sát tầm vận động (ROM test)';
+  if (/thoát\s*vị|l4|l5|đĩa\s*đệm/i.test(text)) {
+    healthCondition = 'Thoát vị đĩa đệm (L4-L5 / Cột sống)';
+  } else if (/vai\s*gáy|cổ|bả\s*vai|tê\s*tay|cánh\s*tay/i.test(text)) {
+    healthCondition = 'Đau mỏi cổ vai gáy & tê bì cánh tay';
+  } else if (/thắt\s*lưng|cột\s*sống|đau\s*lưng|thoái\s*hóa/i.test(text)) {
+    healthCondition = 'Thoái hóa / Đau thắt lưng cột sống';
+  } else if (/khớp\s*gối|gối/i.test(text)) {
+    healthCondition = 'Đau thoái hóa khớp gối';
+  }
+
+  let serviceInterest = 'Kiểm tra tầm vận động (ROM test) & Buổi tập thử';
+  if (/pt|1:1|kèm\s*1|cá\s*nhân/i.test(text)) {
+    serviceInterest = 'Lớp PT kèm 1:1 cá nhân hóa';
+  } else if (/nhóm|lớp\s*nhóm/i.test(text)) {
+    serviceInterest = 'Lớp trị liệu nhóm nhỏ';
+  } else if (/hlv|đào\s*tạo/i.test(text)) {
+    serviceInterest = 'Đào tạo Huấn luyện viên Yoga Quốc tế';
+  }
+
+  let preferredTime = 'Linh hoạt theo lịch hẹn';
+  if (/tối|19h|18h|17h/i.test(text)) {
+    preferredTime = 'Khung giờ tối (sau giờ làm)';
+  } else if (/sáng|5h|6h|7h/i.test(text)) {
+    preferredTime = 'Khung giờ sáng sớm';
+  } else if (/trưa|chiều/i.test(text)) {
+    preferredTime = 'Khung giờ trưa / chiều';
+  }
+
+  return {
+    fullName,
+    phone,
+    healthCondition,
+    serviceInterest,
+    preferredTime
+  };
+}
 
 export function getViciConsultation(message: string): string {
   const lower = (message || '').toLowerCase().trim();
 
-  // 1. HỎI VỀ LỊCH HỌC, THỜI KHÓA BIỂU, CA TẬP, CHỌN LỚP THEO KHUNG GIỜ LÀM VIỆC (VÍ DỤ: LÀM 8H-18H, DÂN VĂN PHÒNG, CA SÁNG, CA TỐI)
+  // 0. NẾU TIN NHẮN CHỨA SỐ ĐIỆN THOẠI -> TỰ ĐỘNG XÁC NHẬN LEAD ĐẶT LỊCH
+  const extracted = extractLeadFromText(message);
+  if (extracted) {
+    const greetingName = extracted.fullName ? ` ${extracted.fullName}` : '';
+    return `Dạ, Vici Care xin chào${greetingName} ạ! 🙏
+
+Mình đã ghi nhận thông tin đăng ký của bạn:
+- **Số điện thoại / Zalo:** **${extracted.phone}**
+- **Tình trạng sức khỏe:** ${extracted.healthCondition}
+- **Nhu cầu:** ${extracted.serviceInterest}
+- **Khung giờ mong muốn:** ${extracted.preferredTime}
+
+✨ **Vici Care đã chuyển thông tin của bạn vào hệ thống CRM để xếp lịch Kiểm tra tầm vận động (ROM test) và chuẩn bị buổi tập thử an toàn nhất.** Đội ngũ chuyên môn sẽ liên hệ lại với bạn trong vòng 5 - 10 phút để xác nhận ngày giờ cụ thể.
+
+Bạn hoàn toàn an tâm nhé, mọi bài tập tại Vici Yoga Therapy đều tuân thủ nguyên tắc **an toàn sinh học, không ép dẻo quá đà và luôn có giáo viên nắn chỉnh theo sát từng động tác**!`;
+  }
+
+  // TRƯỜNG HỢP 1 (TEST CASE 1): HỌC VIÊN BỊ THOÁT VỊ ĐĨA ĐỆM L4-L5, THOÁI HÓA CỘT SỐNG THẮT LƯNG
+  if (
+    lower.includes('thoát vị') ||
+    lower.includes('đĩa đệm') ||
+    lower.includes('l4') ||
+    lower.includes('l5') ||
+    lower.includes('s1') ||
+    lower.includes('thắt lưng') ||
+    lower.includes('trượt đốt sống') ||
+    (lower.includes('cột sống') && (lower.includes('đau') || lower.includes('thoái hóa') || lower.includes('tập được không')))
+  ) {
+    return `Namaste bạn! Vici Care rất thấu hiểu cảm giác khó chịu và bất tiện mà tình trạng thoát vị đĩa đệm (L4-L5, L5-S1) gây ra trong sinh hoạt hàng ngày của bạn. 🌿
+
+Vici Care xin khẳng định: **Người bị thoát vị đĩa đệm hoàn toàn CÓ THỂ và RẤT NÊN tập luyện Yoga Trị liệu phục hồi**, với cam kết an toàn tuyệt đối, không đau buốt:
+
+🔬 **1. CƠ CHẾ VẬN ĐỘNG & KHOA HỌC PHỤC HỒI:**
+- Khi đĩa đệm bị phình hoặc thoát vị, nhân nhầy gây kích thích rễ thần kinh tủy sống. Bài tập trị liệu tại VICI tập trung **kéo giãn trục dọc (Axial Elongation) nhằm giải áp giữa các đốt sống**, tạo khoảng trống tự nhiên để nhân nhầy dịch chuyển về vị trí an toàn.
+- Đồng thời, giáo viên hướng dẫn gia cố **nhóm cơ lõi sâu (Core muscles - đặc biệt là cơ ngang bụng Transversus Abdominis)** tạo thành "đai nẹp sinh học" vững chắc giảm tải trọng lực dồn lên thắt lưng.
+- **Cam kết an toàn:** Loại bỏ hoàn toàn các tư thế vặn xoắn gắt, uốn cong lưng quá đà hoặc gập người kéo giật.
+
+🧘 **2. ĐỊNH HƯỚNG GIẢI PHÁP TẠI VICI:**
+- **Lớp Huấn luyện cá nhân 1:1 (PT):** Được thiết kế giáo án riêng biệt dựa trên phim chụp và tình trạng thực tế của bạn, giáo viên kèm sát từng chuyển động.
+- **Lớp Trị liệu Nhóm nhỏ:** Giới hạn số lượng học viên để giáo viên luôn theo sát và căn chỉnh dụng cụ hỗ trợ (block xốp, dây đai, gối nêm chuyên dụng).
+
+📋 **3. ĐẶT LỊCH TRẢI NGHIỆM:**
+Để đảm bảo an toàn cao nhất, Vici Care trân trọng mời bạn đến tham gia **Buổi kiểm tra tầm vận động (ROM test)** và trải nghiệm buổi tập phục hồi thử.
+
+👉 **Bạn có thể để lại Họ tên và Số điện thoại/Zalo cùng khung giờ mong muốn (sáng, chiều hay tối) ngay tại đây**, Vici Care sẽ hỗ trợ bạn xếp lịch hẹn trực tiếp cùng chuyên gia nhé!`;
+  }
+
+  // TRƯỜNG HỢP 2 (TEST CASE 2): KHÁCH VĂN PHÒNG ĐAU MỎI CỔ VAI GÁY, TÊ CÁNH TAY
+  if (
+    lower.includes('vai gáy') ||
+    lower.includes('đau cổ') ||
+    lower.includes('mỏi cổ') ||
+    lower.includes('bả vai') ||
+    lower.includes('tê tay') ||
+    lower.includes('cánh tay') ||
+    lower.includes('gù lưng') ||
+    (lower.includes('văn phòng') && (lower.includes('mỏi') || lower.includes('đau') || lower.includes('ngồi máy tính'))) ||
+    lower.includes('ngồi máy tính')
+  ) {
+    return `Namaste bạn! Tình trạng đau nhức hai bên bả vai và tê tê cánh tay là vấn đề rất phổ biến ở anh chị em làm việc văn phòng do thói quen ngồi máy tính nhiều giờ liên tục. Vici Care rất thấu hiểu sự bất tiện này. 🙏
+
+🔬 **1. NGUYÊN NHÂN VẬN ĐỘNG HỌC:**
+- Khi bạn làm việc trên máy tính hay dùng điện thoại, đầu có xu hướng đổ về phía trước khiến trọng lực tác động lên đốt sống cổ tăng gấp 3-4 lần.
+- Điều này làm **co rút mạn tính nhóm cơ thang (Trapezius) và cơ nâng vai (Levator Scapulae)**, gây chèn ép lên đám rối thần kinh cánh tay, dẫn tới hiện tượng đau ê ẩm bả vai và tê bì xuống cánh tay, ngón tay.
+
+🌿 **2. GIẢI PHÁP PHỤC HỒI TẠI VICI:**
+- **Lớp Chuyên đề Cổ Vai Gáy:** Sử dụng phương pháp 6D Yoga Trị Liệu căn chỉnh các hướng chuyển động của cột sống cổ một cách êm ái, giải phóng các điểm chèn ép cơ mạc (Trigger Points).
+- **Yin Yoga & Kéo giãn phục hồi sâu:** Giúp mở khớp vai, kéo dài lồng ngực và thư giãn hệ thần kinh.
+- **Nguyên tắc an toàn:** Không bẻ vặn cổ phát tiếng "rắc" đột ngột; tôn trọng giới hạn tự nhiên của cơ thể.
+
+📋 **3. ĐẶT LỊCH TRẢI NGHIỆM:**
+Vici Care mời bạn ghé Trung tâm để thực hiện **bài kiểm tra tầm vận động khớp vai và đốt sống cổ (ROM test)** hoàn toàn miễn phí trong buổi trải nghiệm đầu tiên.
+
+👉 **Bạn vui lòng chia sẻ Họ tên và Số điện thoại/Zalo cùng khung giờ thuận tiện (sau giờ làm 17:45, 19:00 hoặc sáng sớm)**, Vici Care sẽ gửi lịch học chi tiết và giữ chỗ tập thử cho bạn ngay nhé!`;
+  }
+
+  // TRƯỜNG HỢP 3 (TEST CASE 3): KHÁCH HÀNG HỎI HỌC PHÍ / BẢNG GIÁ CHUNG
+  if (
+    lower.includes('học phí') ||
+    lower.includes('bảng giá') ||
+    lower.includes('giá bao nhiêu') ||
+    lower.includes('nhiêu một tháng') ||
+    lower.includes('bao nhiêu tiền') ||
+    lower.includes('chi phí') ||
+    lower.includes('gói tập') ||
+    lower.includes('đăng ký học')
+  ) {
+    return `Namaste bạn! Vici Care xin gửi đến bạn thông tin tổng quan về các hình thức rèn luyện và chính sách học phí tại VICI Yoga Therapy Center:
+
+🌿 **CÁC HÌNH THỨC LỚP HỌC CHUYÊN SÂU:**
+1. **Lớp Trị Liệu Nhóm Nhỏ (Giới hạn số lượng):**
+   - Đảm bảo giáo viên luôn quan sát và theo sát từng động tác, hỗ trợ dụng cụ trị liệu cho từng học viên.
+   - Các gói hội viên linh hoạt: 3 tháng (~850.000đ/tháng), 6 tháng (~800.000đ/tháng), và Gói VIP 1 năm (tặng kèm buổi Scan trị liệu 1:1 và vé Workshop chuông xoay).
+2. **Lớp Huấn Luyện Cá Nhân 1:1 (PT Trị Liệu Chuyên Sâu):**
+   - Giáo án thiết kế riêng biệt 100% dựa trên hồ sơ bệnh lý (thoát vị đĩa đệm, thoái hóa khớp, lệch vẹo cột sống) nhằm phục hồi nhanh và an toàn nhất.
+   - Buổi Scan Trị Liệu 1-1 (45-60 phút): 650.000 VNĐ.
+3. **Chương Trình Đào Tạo HLV Quốc Tế E-RYT 500 / YACEP:** Chứng chỉ chuẩn Yoga Alliance Hoa Kỳ do Master Henry Phan trực tiếp giảng dạy.
+
+🎁 **CHÍNH SÁCH ƯU ĐÃI ĐẶC BIỆT:**
+VICI luôn dành tặng **Buổi kiểm tra tầm vận động (ROM test) và ưu đãi trải nghiệm buổi tập đầu tiên** để bạn cảm nhận trực tiếp sự phù hợp trước khi quyết định đăng ký gói tập.
+
+👉 **Bạn vui lòng để lại Tên và Số điện thoại/Zalo**, Vici Care sẽ gửi biểu phí chi tiết theo thời hạn và ưu đãi mới nhất phù hợp với nhu cầu của bạn nhé!`;
+  }
+
   const isScheduleOrTimeInquiry =
-    lower.includes('lịch') ||
+    lower.includes('lịch học') ||
     lower.includes('thời khóa biểu') ||
-    lower.includes('tkb') ||
-    lower.includes('ca tập') ||
-    lower.includes('ca học') ||
-    lower.includes('mấy giờ') ||
+    lower.includes('thời khoá biểu') ||
     lower.includes('giờ học') ||
+    lower.includes('mấy giờ') ||
+    lower.includes('ca tập') ||
     lower.includes('giờ tập') ||
-    lower.includes('lớp nào phù hợp') ||
-    lower.includes('lớp phù hợp') ||
-    lower.includes('có lớp nào') ||
-    lower.includes('chọn lớp nào') ||
     lower.includes('khung giờ') ||
+    lower.includes('lịch tập') ||
+    lower.includes('buổi tối') ||
+    lower.includes('buổi sáng') ||
     lower.includes('tan làm') ||
     lower.includes('tan ca') ||
-    lower.includes('làm từ') ||
-    lower.includes('làm việc từ') ||
     lower.includes('hành chính') ||
-    (lower.includes('lớp') && (lower.includes('sáng') || lower.includes('tối') || lower.includes('chiều') || lower.includes('trưa'))) ||
-    (lower.includes('rảnh') && (lower.includes('sáng') || lower.includes('tối') || lower.includes('chiều') || lower.includes('giờ')));
+    lower.includes('văn phòng');
 
   if (isScheduleOrTimeInquiry) {
     const isOfficeHours =
@@ -133,7 +303,7 @@ export function getViciConsultation(message: string): string {
 💡 **LỜI KHUYÊN TỪ MASTER HENRY PHAN:**
 Người ngồi văn phòng 10 tiếng liên tục rất dễ gặp phải tình trạng cơ ngực co ngắn gây gù vai và cơ thắt lưng bị chèn ép. Bạn có thể bắt đầu bằng **01 buổi Scan Trị Liệu 1-1 (45-60 phút, 650.000đ)** để Master đo lường góc lệch cột sống và xếp lớp chính xác nhất, hoặc đăng ký tham gia ngay **lớp tối 19:00 - 20:00**.
 
-Bạn thấy khung giờ tối 19:00 hay sáng sớm 05:00 thuận tiện cho lịch trình của bạn hơn? Hãy chia sẻ với MY VICI nhé!`;
+Bạn thấy khung giờ tối 19:00 hay sáng sớm 05:00 thuận tiện cho lịch trình của bạn hơn? Hãy chia sẻ với Vici Care nhé!`;
     }
 
     // Câu hỏi lịch học tổng quát
@@ -156,7 +326,7 @@ Bạn thấy khung giờ tối 19:00 hay sáng sớm 05:00 thuận tiện cho l�
 * **Scan Trị Liệu Cơ - Vai - Cổ - Gáy 1-1 (45-60 phút, 650k):** Đặt lịch linh hoạt theo khung giờ riêng của bạn.
 * **Workshop Chuông Xoay Chữa Lành:** Tổ chức định kỳ vào sáng Thứ 7 (tuần thứ 2 & thứ 4 hàng tháng).
 
-Bạn thuận tiện tham gia vào khung giờ nào nhất (sáng sớm, ca chiều hay ca tối sau giờ làm) để MY VICI tư vấn chi tiết lớp học phù hợp cho bạn nhé?`;
+Bạn thuận tiện tham gia vào khung giờ nào nhất (sáng sớm, ca chiều hay ca tối sau giờ làm) để Vici Care tư vấn chi tiết lớp học phù hợp cho bạn nhé?`;
   }
 
   // 2. CÂU HỎI TƯ VẤN CHUNG / TƯ VẤN GIÚP TÔI / BẮT ĐẦU TỪ ĐÂU
@@ -176,7 +346,7 @@ Bạn thuận tiện tham gia vào khung giờ nào nhất (sáng sớm, ca chi�
     (lower.includes('tư vấn') && !lower.includes('thoát vị') && !lower.includes('vai gáy') && !lower.includes('học phí') && !lower.includes('lịch') && !lower.includes('địa chỉ') && !lower.includes('hlv') && !lower.includes('gối') && !lower.includes('ngủ'));
 
   if (isGeneralConsultation) {
-    return `Namaste! 🙏 Rất vui được gặp bạn. Tôi là **MY VICI** – Trợ lý Chuyên môn Trí tuệ Nhân tạo của VICI Yoga Therapy Training Center. Tôi xin phép đưa ra tư vấn định hướng toàn diện cho bạn ngay sau đây:
+    return `Namaste! 🙏 Rất vui được gặp bạn. Mình là **Vici Care** – Chuyên viên tư vấn phục hồi & trị liệu của Vici Yoga Therapy Training Center. Mình xin phép đưa ra định hướng giải phẫu học và lộ trình an toàn cho bạn ngay sau đây:
 
 🌿 **1. ĐỊNH HƯỚNG CÁC NHÓM TRỊ LIỆU & RÈN LUYỆN CHÍNH TẠI VICI:**
 * **Phục hồi Cột sống & Đĩa đệm (Thắt lưng, Thoát vị, Thoái hóa):** Áp dụng nguyên lý kéo giãn trục dọc (Axial Elongation) và kích hoạt nhóm cơ ngang bụng (Transversus Abdominis) để tạo "khung đỡ tự nhiên" bảo vệ đốt sống, giảm áp lực nhân nhầy lên rễ thần kinh.
@@ -186,13 +356,13 @@ Bạn thuận tiện tham gia vào khung giờ nào nhất (sáng sớm, ca chi�
 * **Khóa Nâng cao Ashtanga (10 chuyên đề) & Đào tạo HLV Quốc Tế E-RYT 500:** Kèm cặp trực tiếp cùng Master Henry Phan theo chuẩn Yoga Alliance Hoa Kỳ.
 
 📋 **2. QUY TRÌNH 4 BƯỚC CHUẨN HÓA TẠI VICI:**
-1. **Bước 1 - Tầm soát 1-1:** Buổi Scan Trị Liệu Cơ - Vai - Cổ - Gáy (45-60 phút) để kiểm tra góc lệch trục, biên độ vận động và điểm đau cơ mạc.
-2. **Bước 2 - Lập phác đồ:** Thiết kế chuỗi bài tập và điều chỉnh thói quen sinh hoạt riêng cho thể trạng của bạn.
-3. **Bước 3 - Luyện tập định tuyến:** Tham gia lớp tập trị liệu chuyên biệt hoặc lớp kèm 1-1 với sự nắn chỉnh trực tiếp.
-4. **Bước 4 - Tái đánh giá:** Kiểm tra sự cải thiện của biên độ khớp và chất lượng giấc ngủ sau từng chu kỳ.
+1. **Bước 1 - Khảo sát tầm vận động (ROM Test):** Đánh giá góc nghiêng cột sống, độ gập duỗi và các điểm chèn ép thần kinh.
+2. **Bước 2 - Lập phác đồ cá nhân hóa:** Thiết kế chuỗi bài tập nắn chỉnh và cân bằng cơ thể.
+3. **Bước 3 - Luyện tập định tuyến:** Tham gia lớp tập trị liệu chuyên biệt hoặc lớp kèm 1-1 với sự nắn chỉnh trực tiếp của giáo viên.
+4. **Bước 4 - Tái đánh giá & Duy trì:** Kiểm tra sự cải thiện của biên độ khớp sau từng chu kỳ.
 
 💬 **Bạn đang quan tâm đến mục tiêu nào nhất?**
-Hãy chia sẻ với MY VICI: Bạn có đang bị đau mỏi ở vùng nào (cổ vai gáy, thắt lưng, khớp gối) hay bạn là người mới muốn bắt đầu tập để nâng cao sức khỏe? Tôi sẽ tư vấn bài tập và lớp học cụ thể ngay cho bạn nhé!`;
+Hãy chia sẻ với Vici Care: Bạn có đang bị đau mỏi ở vùng nào (cổ vai gáy, thắt lưng, khớp gối) hay bạn là người mới muốn bắt đầu tập để nâng cao sức khỏe? Mình sẽ hỗ trợ bạn ngay nhé!`;
   }
 
   // 2. THOÁT VỊ ĐĨA ĐỆM (L4-L5, L5-S1), THOÁI HÓA CỘT SỐNG THẮT LƯNG, GAI CỘT SỐNG
@@ -359,7 +529,7 @@ Bạn hãy chia sẻ xem đầu gối của bạn bị đau khi đi cầu thang,
 
 ❌ **LƯU Ý:** Không ngồi trên ví tiền hoặc vật cứng ở túi quần sau, tránh ngồi ghế quá thấp khiến khớp háng bị gập nhọn.
 
-Tại VICI, Master Henry Phan có phác đồ nắn chỉnh giải áp thần kinh tọa 1-1 rất hiệu quả. Bạn có thể mô tả vị trí đau buốt nhất của mình để MY VICI hỗ trợ thêm nhé!`;
+Tại VICI, Master Henry Phan có phác đồ nắn chỉnh giải áp thần kinh tọa 1-1 rất hiệu quả. Bạn có thể mô tả vị trí đau buốt nhất của mình để Vici Care hỗ trợ thêm nhé!`;
   }
 
   // 8. MẤT NGỦ, STRESS, ĐAU ĐẦU, TIỀN ĐÌNH, LO ÂU
@@ -603,8 +773,8 @@ Các Thầy Cô luôn trực tiếp nắn chỉnh tư thế trong từng buổi 
   ) {
     return `Namaste bạn! VICI luôn chào đón bạn đến trải nghiệm:
 * **Buổi trải nghiệm lớp tập nhóm:** Cảm nhận không khí tập luyện ấm áp và sự nắn chỉnh tận tình của giáo viên.
-* **Buổi Scan Trị Liệu 1-1 (45-60 phút, 650.000đ):** Master sẽ đo đạc độ lệch trục cột sống, biên độ khớp, tầm soát điểm đau cơ mạc và thiết lập phác đồ riêng cho bạn trước khi xếp lớp.
-Bạn có thể cho MY VICI biết bạn muốn tham gia trải nghiệm vào ngày nào trong tuần nhé!`;
+* **Buổi Scan Trị Liệu & ROM test 1-1 (45-60 phút, 650.000đ):** Master sẽ đo đạc độ lệch trục cột sống, biên độ khớp, tầm soát điểm đau cơ mạc và thiết lập phác đồ riêng cho bạn trước khi xếp lớp.
+Bạn có thể cho Vici Care biết bạn muốn tham gia trải nghiệm vào ngày nào trong tuần nhé!`;
   }
 
   // 20. ĐĂNG KÝ / LIÊN HỆ / HOTLINE KHI NGƯỜI DÙNG THỰC SỰ YÊU CẦU
@@ -621,11 +791,11 @@ Bạn có thể cho MY VICI biết bạn muốn tham gia trải nghiệm vào ng
 🏢 **Địa chỉ:** Căn hộ B1-0705, Chung cư Opal Boulevard, đường Phạm Văn Đồng, TP. Dĩ An / TP. Thủ Đức, TP. HCM.
 ⏰ **Giờ mở cửa:** 06:00 - 20:30 (Thứ 2 đến Thứ 7).
 
-Ngoài ra, MY VICI vẫn luôn túc trực ở đây để tư vấn mọi thắc mắc về động tác, bài tập hoặc lộ trình trị liệu cho bạn. Bạn cứ đặt câu hỏi nhé!`;
+Ngoài ra, Vici Care vẫn luôn túc trực ở đây để tư vấn mọi thắc mắc về động tác, bài tập hoặc lộ trình trị liệu cho bạn. Bạn cứ đặt câu hỏi nhé!`;
   }
 
   // DEFAULT CONVERSATIONAL ADVICE
-  return `Namaste bạn! Cảm ơn bạn đã trò chuyện cùng MY VICI. 🙏
+  return `Namaste bạn! Cảm ơn bạn đã trò chuyện cùng Vici Care. 🙏
 
 Tại VICI Yoga Therapy, dưới sự dẫn dắt của **Master Henry Phan (E-RYT 500)**, chúng tôi chuyên sâu về:
 1. **Trị liệu Cột sống & Cơ xương khớp:** Thoát vị đĩa đệm, thoái hóa L4-L5, đau mỏi cổ vai gáy, đau thần kinh tọa và khớp gối.
@@ -633,5 +803,5 @@ Tại VICI Yoga Therapy, dưới sự dẫn dắt của **Master Henry Phan (E-R
 3. **Khóa Ashtanga Nâng Cao & Đào Tạo HLV Quốc Tế E-RYT 500:** Cấp bằng Yoga Alliance Hoa Kỳ.
 4. **Workshop Chuông Xoay Himalaya:** Giải tỏa stress và điều trị mất ngủ.
 
-Bạn có thể chia sẻ cụ thể hơn về tình trạng sức khỏe hiện tại của bạn (vị trí đau mỏi, tiền sử chấn thương hoặc mục tiêu bạn mong muốn) để MY VICI tư vấn bài tập và phác đồ tốt nhất cho bạn ngay nhé!`;
+Bạn có thể chia sẻ cụ thể hơn về tình trạng sức khỏe hiện tại của bạn (vị trí đau mỏi, tiền sử chấn thương hoặc mục tiêu bạn mong muốn) để Vici Care tư vấn bài tập và phác đồ tốt nhất cho bạn ngay nhé!`;
 }

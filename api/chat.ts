@@ -49,7 +49,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       source: result.source,
       model: result.model,
       isAiActive: result.isAiActive,
-      notice: result.notice
+      notice: result.notice,
+      capturedLead: result.capturedLead
     });
   } catch (err: any) {
     console.error('Error handling /api/chat on Vercel:', err);

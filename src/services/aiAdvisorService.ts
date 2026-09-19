@@ -6,7 +6,7 @@
  */
 
 import { GoogleGenAI } from '@google/genai';
-import { VICI_SYSTEM_PROMPT, getViciConsultation } from '../data/viciAdvisor';
+import { VICI_CARE_SYSTEM_PROMPT, VICI_CARE_TOOL, getViciConsultation, extractLeadFromText, type ExtractedLead } from '../data/viciAdvisor';
 
 let geminiClient: GoogleGenAI | null = null;
 
@@ -20,7 +20,7 @@ export function getGeminiClient(): GoogleGenAI | null {
       apiKey: apiKey.trim(),
       httpOptions: {
         headers: {
-          'User-Agent': 'vici-yoga-aistudio-build'
+          'User-Agent': 'vici-care-therapy-ai'
         }
       }
     });
@@ -41,6 +41,7 @@ export interface ChatResponseResult {
   model?: string;
   isAiActive: boolean;
   notice?: string;
+  capturedLead?: ExtractedLead;
 }
 
 export async function processChatConsultation(
@@ -50,7 +51,7 @@ export async function processChatConsultation(
   const trimmedMessage = (message || '').trim();
   if (!trimmedMessage) {
     return {
-      reply: 'Xin chào! VICI có thể hỗ trợ tư vấn lộ trình tập luyện hoặc giải đáp câu hỏi nào giúp bạn?',
+      reply: 'Namaste! Vici Care có thể hỗ trợ tư vấn lộ trình phục hồi, giải phẫu học cơ thể hoặc giải đáp câu hỏi trị liệu nào giúp bạn?',
       source: 'local_expert',
       isAiActive: false
     };
@@ -63,10 +64,10 @@ export async function processChatConsultation(
     const candidateModels = [
       'gemini-3.6-flash',
       'gemini-3.5-flash-lite',
-      'gemini-3.1-flash-lite'
+      'gemini-2.5-flash'
     ];
 
-    const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
+    const contents: Array<{ role: 'user' | 'model'; parts: Array<any> }> = [];
 
     // Map conversation history to Gemini structure
     for (const item of rawHistory.slice(-8)) {
@@ -104,18 +105,84 @@ export async function processChatConsultation(
           model: modelName,
           contents,
           config: {
-            systemInstruction: VICI_SYSTEM_PROMPT,
-            temperature: 0.65
+            systemInstruction: VICI_CARE_SYSTEM_PROMPT,
+            temperature: 0.5,
+            tools: [VICI_CARE_TOOL as any]
           }
         });
 
+        let capturedLead: ExtractedLead | undefined;
+
+        // Check if Gemini invoked save_contact_lead tool
+        if (response.functionCalls && response.functionCalls.length > 0) {
+          for (const call of response.functionCalls) {
+            if (call.name === 'save_contact_lead') {
+              capturedLead = call.args as any;
+              console.log('[Vici Care] Đã ghi nhận Lead từ Function Calling:', capturedLead);
+
+              // Provide functionResponse back to continue natural empathetic conversation
+              const candidateContent = response.candidates?.[0]?.content;
+              const followUpContents = [
+                ...contents,
+                candidateContent || {
+                  role: 'model',
+                  parts: [{ functionCall: call }]
+                },
+                {
+                  role: 'user',
+                  parts: [
+                    {
+                      functionResponse: {
+                        name: 'save_contact_lead',
+                        response: {
+                          status: 'success',
+                          message: 'Đã lưu trữ thông tin khách hàng vào CRM và lên lịch hẹn kiểm tra tầm vận động ROM test thành công.'
+                        }
+                      }
+                    }
+                  ]
+                }
+              ];
+
+              const followUpResponse = await ai.models.generateContent({
+                model: modelName,
+                contents: followUpContents,
+                config: {
+                  systemInstruction: VICI_CARE_SYSTEM_PROMPT,
+                  temperature: 0.5
+                }
+              });
+
+              const followUpText = followUpResponse.text?.trim();
+              if (followUpText) {
+                return {
+                  reply: followUpText,
+                  source: 'gemini',
+                  model: modelName,
+                  isAiActive: true,
+                  capturedLead
+                };
+              }
+            }
+          }
+        }
+
         const replyText = response.text?.trim();
         if (replyText) {
+          // Fallback text parser in case Gemini answered with text instead of tool call when phone was given
+          if (!capturedLead) {
+            const fallbackExtracted = extractLeadFromText(trimmedMessage);
+            if (fallbackExtracted) {
+              capturedLead = fallbackExtracted;
+            }
+          }
+
           return {
             reply: replyText,
             source: 'gemini',
             model: modelName,
-            isAiActive: true
+            isAiActive: true,
+            capturedLead
           };
         }
       } catch (err: any) {
@@ -124,16 +191,18 @@ export async function processChatConsultation(
     }
   }
 
-  // Fallback to VICI Expert Engine
+  // Fallback to Vici Care Expert Engine
   const localReply = getViciConsultation(trimmedMessage);
+  const fallbackLead = extractLeadFromText(trimmedMessage);
   const hasKey = !!process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MY_GEMINI_API_KEY';
 
   return {
     reply: localReply,
     source: 'local_expert',
     isAiActive: false,
+    capturedLead: fallbackLead || undefined,
     notice: hasKey
       ? undefined
-      : 'Vercel Notice: Chưa cấu hình biến GEMINI_API_KEY trong Vercel Environment Variables. Hệ thống đang sử dụng kho tri thức trị liệu tích hợp của VICI.'
+      : 'Thông báo: Hệ thống Vici Care đang vận hành ở chế độ Trị Liệu Trực Tiếp với kho tri thức chuyên sâu chuẩn hóa.'
   };
 }

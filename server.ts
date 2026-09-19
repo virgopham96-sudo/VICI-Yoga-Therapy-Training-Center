@@ -210,13 +210,46 @@ app.post('/api/chat', async (req, res) => {
       : [];
 
     const result = await processChatConsultation(message, rawHistory);
+
+    // If a lead was captured via function calling or text extraction, save to leadsStore
+    if (result.capturedLead && result.capturedLead.phone) {
+      const existing = leadsStore.find((l) => l.phone.replace(/[\s.-]/g, '') === result.capturedLead!.phone.replace(/[\s.-]/g, ''));
+      if (!existing) {
+        const autoLead = {
+          id: `VICI-LEAD-${Date.now().toString().slice(-4)}`,
+          createdAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+          name: result.capturedLead.fullName || 'Học viên tư vấn Vici Care',
+          phone: result.capturedLead.phone,
+          email: '',
+          source: 'Vici Care AI Advisor',
+          interest: result.capturedLead.serviceInterest || 'Kiểm tra tầm vận động (ROM test)',
+          category: 'RECOVERY_THERAPY',
+          experience: 'Đang khảo sát',
+          goals: [result.capturedLead.healthCondition || 'Trị liệu phục hồi'],
+          preferredTime: result.capturedLead.preferredTime || 'Linh hoạt theo lịch hẹn',
+          preferredFormat: 'Trực tiếp tại Studio (Opal Boulevard)',
+          recommendedCourse: 'Buổi Kiểm Tra ROM Test & Lớp Phục Hồi Thử',
+          leadScore: 'HOT' as const,
+          status: 'New' as const,
+          assignedTo: 'Master Mỹ Kiều',
+          conversationSummary: `Tự động trích xuất từ Vici Care: ${result.capturedLead.healthCondition || 'Tư vấn trị liệu'}. Đăng ký: ${result.capturedLead.serviceInterest || 'ROM test'}.`,
+          staffNotes: `Lead từ Vici Care AI Assistant qua Function Calling. Cần liên hệ trong 5-10 phút để xác nhận khung giờ (${result.capturedLead.preferredTime || 'Linh hoạt'}).`,
+          nextAction: 'Gọi điện xác nhận lịch hẹn ROM test & tư vấn trực tiếp',
+          isSampleData: false
+        };
+        leadsStore = [autoLead, ...leadsStore];
+        console.log('[Server] Đã lưu Lead mới từ Vici Care:', autoLead.id, autoLead.name, autoLead.phone);
+      }
+    }
+
     res.json({
       success: true,
       reply: result.reply,
       source: result.source,
       model: result.model,
       isAiActive: result.isAiActive,
-      notice: result.notice
+      notice: result.notice,
+      capturedLead: result.capturedLead
     });
   } catch (err: any) {
     console.error('Lỗi API /api/chat trên server:', err);

@@ -26,7 +26,7 @@ export default function MobileBottomBar({ onOpenAIChat, onOpenRegister }: Mobile
           className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#D69A2D]/15 text-[#9E6910] text-xs font-bold border border-[#D69A2D]/30 active:scale-98 transition-all cursor-pointer"
         >
           <Sparkles className="w-4 h-4 text-[#D69A2D]" />
-          <span>Hỏi MY VICI</span>
+          <span>Hỏi Vici Care</span>
         </button>
 
         {/* Register Button */}
